@@ -1,6 +1,9 @@
-import Navbar from "@/components/ui/navbar/navbar";
-export default function Home() {
+function Home() {
   return (
-    <div><Navbar/></div>
+    <section>
+      Home
+    </section>
   );
 }
+
+export default Home;
