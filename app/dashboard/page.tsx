@@ -4,7 +4,7 @@ import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { PublicKey, AccountInfo, ParsedAccountData } from "@solana/web3.js";
 import { useEffect, useState } from "react";
 import Spinner from "@/components/ui/load-spinner";
-import Link from "next/link";
+import { redirect } from "next/navigation";
 
 function Dashboard() {
   const { connection } = useConnection();
@@ -12,9 +12,7 @@ function Dashboard() {
   const isConnected = useWallet().connected;
 
   if (!isConnected) {
-    return <div className="h-screen overflow-clip flex justify-center items-center">
-      Please Connect your wallet to list your tokens.
-    </div>
+    redirect("/");
   }
 
   const [tokenAccounts, setTokenAccounts] = useState<{
@@ -49,8 +47,8 @@ function Dashboard() {
   }, []);
 
   return (
-    <div className="p-5 text-cyan-300 text-shadow-lg filter drop-shadow-lg drop-shadow-green-500/50 border border-cyan-300 shadow-[0_0_15px_rgba(59,130,246,0.5)]">
-      <div className="grid grid-cols-3">
+    <div className="px-5 text-cyan-300 text-shadow-lg filter drop-shadow-lg drop-shadow-green-500/50 border border-cyan-300 shadow-[0_0_15px_rgba(59,130,246,0.5)]">
+      <div className="grid grid-cols-3 py-5">
         <div className="flex justify-center border border-purple-500 shadow-[0_0_15px_rgba(59,130,246,0.5)] p-2"><span>Public Key</span></div>
         <div className="flex justify-center border border-purple-500 shadow-[0_0_15px_rgba(59,130,246,0.5)] p-2"><span>Mint Address</span></div>
         <div className="flex justify-center border border-purple-500 shadow-[0_0_15px_rgba(59,130,246,0.5)] p-2"><span>Amount</span></div>

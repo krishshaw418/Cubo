@@ -13,21 +13,27 @@ function Navbar() {
 
   return (
     <nav className="flex w-screen justify-between items-center pr-5 top-0 z-50 sticky bg-neutral-800/30 backdrop-blur-lg">
+      <Link href="/">
       <div className="flex items-center">
         <Image src="/cubo-logo-centered.svg" alt="cubo-logo" width={70} height={70} className="cropped-svg"/>
-        <div className="logo-text-2">CUBO</div>
-      </div>
+        <div className="logo-text">CUBO</div>
+        </div>
+      </Link>
       <div className="flex items-center gap-5">
         <Tabs defaultValue="home">
           <TabsList variant="line">
+            <Link href="/">
             <TabsTrigger value="home">
-              <Link href="/">Home</Link>
+              Home
             </TabsTrigger>
+            </Link>
             <TabsTrigger value="create">Create NFTs</TabsTrigger>
             {isConnected &&
+            <Link href="/dashboard">
             <TabsTrigger value="dashboard">
-              <Link href="/dashboard">Dashboard</Link>
-            </TabsTrigger>}
+              Dashboard
+            </TabsTrigger>
+            </Link>}
           </TabsList>
         </Tabs>
         <WalletMultiButton />
