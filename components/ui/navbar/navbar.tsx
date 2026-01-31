@@ -18,7 +18,7 @@ function Navbar() {
         <div className="logo-text-2">CUBO</div>
       </div>
       <div className="flex items-center gap-5">
-        <Tabs defaultValue="overview">
+        <Tabs defaultValue="home">
           <TabsList variant="line">
             <TabsTrigger value="home">
               <Link href="/">Home</Link>
