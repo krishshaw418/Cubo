@@ -1,6 +1,6 @@
 "use client"
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
-import "./logo.css";
+import "./navbar.css";
 import Image from "next/image";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ModeToggle } from "../modeToggle";
@@ -12,7 +12,7 @@ function Navbar() {
   const isConnected = useWallet().connected;
 
   return (
-    <nav className="flex w-screen justify-between items-center pr-5 top-0 z-50 sticky bg-neutral-800/30 backdrop-blur-lg">
+    <nav className="flex w-screen justify-between pr-5 top-0 z-50 sticky bg-neutral-800/30 backdrop-blur-lg">
       <Link href="/">
       <div className="flex items-center">
         <Image src="/cubo-logo-centered.svg" alt="cubo-logo" width={70} height={70} className="cropped-svg"/>
@@ -23,20 +23,27 @@ function Navbar() {
         <Tabs defaultValue="home">
           <TabsList variant="line">
             <Link href="/">
-            <TabsTrigger value="home">
+            <TabsTrigger value="home" className="tabs">
               Home
             </TabsTrigger>
             </Link>
-            <TabsTrigger value="create">Create NFTs</TabsTrigger>
             {isConnected &&
-            <Link href="/dashboard">
-            <TabsTrigger value="dashboard">
-              Dashboard
+            <Link href="/tokens">
+            <TabsTrigger value="dashboard" className="tabs">
+              Tokens
             </TabsTrigger>
             </Link>}
           </TabsList>
         </Tabs>
-        <WalletMultiButton />
+        <WalletMultiButton style={{
+          fontFamily: 'Orbitron, sans-serif',
+          backgroundImage: 'linear-gradient(135deg, #21e47f 0%, #68c4f6 100%)',
+          WebkitTextFillColor: 'transparent',
+          WebkitBackgroundClip: 'text',
+          border: "1px solid white",
+          borderRadius: '10px',
+          width: '100%'
+        }}/>
         <ModeToggle/>
       </div>
     </nav>
