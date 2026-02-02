@@ -1,7 +1,20 @@
-import "./home.css";
-function Home() {
+"use client"
+import "./page.css";
+import { calculateHeight } from "@/lib/navBarHeight";
+import { useEffect, useState } from "react";
+function Page() {
+
+  const [height, setHeight] = useState(0);
+
+  useEffect(() => {
+    setHeight(calculateHeight());
+  }, []);
+
   return (
-    <section aria-label="hero" className="flex gap-5 w-full md:w-screen items-center justify-center lg:justify-between p-5 md:p-20 md:my-7 lg:p-30 lg:my-10 overflow-y-hidden">
+    <section aria-label="hero" className="flex gap-5 w-full md:w-screen items-center justify-center lg:justify-between p-5 md:p-20 md:my-7 lg:p-30 lg:my-10 overflow-hidden"
+      style={{
+        height: `calc[100vh - ${height}]`
+      }}>
       <div className="relative flex justify-center items-center p-5">
         <div className="absolute top-0 -left-4 w-72 h-72 bg-linear-to-tr from-purple-500 rounded-full filter blur-xl opacity-70 animate-blob"></div>
         <div className="absolute top-0 -right-4 w-72 h-72 bg-linear-to-tl  from-pink-700 rounded-full filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
@@ -38,4 +51,4 @@ function Home() {
   );
 }
 
-export default Home;
+export default Page;

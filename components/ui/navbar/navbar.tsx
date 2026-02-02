@@ -3,7 +3,7 @@ import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import "./navbar.css";
 import Image from "next/image";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ModeToggle } from "../modeToggle";
+// import { ModeToggle } from "../modeToggle";
 import Link from "next/link";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { MenuIcon } from "lucide-react";
@@ -13,7 +13,7 @@ function Navbar() {
   const isConnected = useWallet().connected;
 
   return (
-    <nav className="flex w-screen justify-between pr-5 top-0 z-50 sticky bg-neutral-800/30 backdrop-blur-lg">
+    <nav id="navbar" aria-label="navbar" className="flex max-w-screen justify-between pr-5 top-0 z-50 sticky bg-neutral-800/30 backdrop-blur-lg">
       <Link href="/">
       <div className="flex items-center">
         <Image src="/cubo-logo-centered.svg" alt="cubo-logo" width={70} height={70} className="cropped-svg"/>
@@ -21,21 +21,20 @@ function Navbar() {
         </div>
       </Link>
       <div className="md:flex items-center gap-5 hidden">
-        <Tabs defaultValue="home">
+        {isConnected && <Tabs defaultValue="home">
           <TabsList variant="line">
             <Link href="/">
-            <TabsTrigger value="home" className="tabs">
-              Home
-            </TabsTrigger>
+              <TabsTrigger value="home" className="tabs after:bg-linear-to-tr after:from-cyan-400 after:to-green-400">
+                Home
+              </TabsTrigger>
             </Link>
-            {isConnected &&
             <Link href="/tokens">
-            <TabsTrigger value="dashboard" className="tabs">
-              Tokens
-            </TabsTrigger>
-            </Link>}
+              <TabsTrigger value="dashboard" className="tabs after:bg-linear-to-tr after:from-cyan-400 after:to-green-400">
+                Tokens
+              </TabsTrigger>
+            </Link>
           </TabsList>
-        </Tabs>
+        </Tabs>}
         <WalletMultiButton style={{
           fontFamily: 'Orbitron, sans-serif',
           backgroundImage: 'linear-gradient(135deg, #21e47f 0%, #68c4f6 100%)',
@@ -43,12 +42,13 @@ function Navbar() {
           WebkitBackgroundClip: 'text',
           borderRadius: '10px',
           width: '100%',
-          boxShadow: '0 0 5px #00FFFF, 0 0 5px #14F195'
+          boxShadow: '0 0 5px #00FFFF, 0 0 5px #14F195',
+          letterSpacing: "3px"
         }} />
-        <ModeToggle />
+        {/* <ModeToggle/> */}
       </div>
       <div className="flex items-center gap-2 md:hidden">
-        <ModeToggle />
+        {/* <ModeToggle /> */}
         <MenuIcon/>
       </div>
     </nav>

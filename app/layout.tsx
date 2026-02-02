@@ -3,7 +3,7 @@ import { Geist, Geist_Mono, Orbitron } from "next/font/google";
 import "./globals.css";
 import { SolanaProvider } from "@/components/providers/solanaProvider";
 import Navbar from "@/components/ui/navbar/navbar";
-import { ThemeProvider } from "@/components/providers/themeProvider";
+import { Toaster } from "@/components/ui/sonner"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -35,17 +35,11 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${orbitronSans.variable} antialiased`}
       >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <SolanaProvider>
-            <Navbar />
-            {children}
-          </SolanaProvider>
-        </ThemeProvider>
+        <SolanaProvider>
+          <Navbar />
+          {children}
+          <Toaster />
+        </SolanaProvider>
       </body>
     </html>
   );
