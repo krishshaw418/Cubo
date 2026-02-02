@@ -6,6 +6,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ModeToggle } from "../modeToggle";
 import Link from "next/link";
 import { useWallet } from "@solana/wallet-adapter-react";
+import { MenuIcon } from "lucide-react";
 
 function Navbar() {
 
@@ -19,7 +20,7 @@ function Navbar() {
         <div className="logo-text">CUBO</div>
         </div>
       </Link>
-      <div className="flex items-center gap-5">
+      <div className="md:flex items-center gap-5 hidden">
         <Tabs defaultValue="home">
           <TabsList variant="line">
             <Link href="/">
@@ -40,11 +41,15 @@ function Navbar() {
           backgroundImage: 'linear-gradient(135deg, #21e47f 0%, #68c4f6 100%)',
           WebkitTextFillColor: 'transparent',
           WebkitBackgroundClip: 'text',
-          border: "1px solid white",
           borderRadius: '10px',
-          width: '100%'
-        }}/>
-        <ModeToggle/>
+          width: '100%',
+          boxShadow: '0 0 5px #00FFFF, 0 0 5px #14F195'
+        }} />
+        <ModeToggle />
+      </div>
+      <div className="flex items-center gap-2 md:hidden">
+        <ModeToggle />
+        <MenuIcon/>
       </div>
     </nav>
   )

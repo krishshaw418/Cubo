@@ -1,8 +1,8 @@
 import "./home.css";
 function Home() {
   return (
-    <section aria-label="hero" className="flex w-screen items-center justify-between md:p-20 md:my-7 lg:p-30 lg:my-10 overflow-y-hidden">
-      <div className="relative">
+    <section aria-label="hero" className="flex gap-5 w-full md:w-screen items-center justify-center lg:justify-between p-5 md:p-20 md:my-7 lg:p-30 lg:my-10 overflow-y-hidden">
+      <div className="relative flex justify-center items-center p-5">
         <div className="absolute top-0 -left-4 w-72 h-72 bg-linear-to-tr from-purple-500 rounded-full filter blur-xl opacity-70 animate-blob"></div>
         <div className="absolute top-0 -right-4 w-72 h-72 bg-linear-to-tl  from-pink-700 rounded-full filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
         <div className="absolute -bottom-10 left-20 w-72 h-72 bg-linear-to-bl from-cyan-400 rounded-full filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
