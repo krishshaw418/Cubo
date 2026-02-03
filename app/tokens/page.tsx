@@ -6,6 +6,8 @@ import { useEffect, useState } from "react";
 import Spinner from "@/components/ui/load-spinner";
 import { toast } from "sonner";
 import { calculateHeight } from "@/lib/navBarHeight";
+import { useMint } from "@/lib/mint";
+import { Button } from "@/components/ui/button";
 
 function Tokens() {
   const { connection } = useConnection();
@@ -17,6 +19,7 @@ function Tokens() {
     account: AccountInfo<ParsedAccountData>;
   }[] | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(true);
+  const { createMint } = useMint();
 
   useEffect(() => {
     setHeight(calculateHeight());
@@ -67,7 +70,20 @@ function Tokens() {
   }
 
   return (
-    <div className="px-5 text-cyan-300 text-shadow-lg filter drop-shadow-lg drop-shadow-green-500/50 border border-cyan-300 shadow-[0_0_15px_rgba(59,130,246,0.5)]">
+    <div className="flex flex-col">
+      <Button type="button" variant="ghost" onClick={async () => {
+        try {
+          const signature = await createMint();
+          if (signature) {
+            toast.success("Transaction successful!");
+          } else {
+            toast.error("Transaction failed!");
+          }
+        } catch (error: any) {
+          toast.error(`Transaction failed: ${error.message}`);
+        }
+      }} className="">Create Token</Button>
+      <div className="px-5 text-cyan-300 text-shadow-lg filter drop-shadow-lg drop-shadow-green-500/50 border border-cyan-300 shadow-[0_0_15px_rgba(59,130,246,0.5)]">
       <div className="grid grid-cols-3 py-5">
         <div className="flex justify-center border border-purple-500 shadow-[0_0_15px_rgba(59,130,246,0.5)] p-2"><span>Public Key</span></div>
         <div className="flex justify-center border border-purple-500 shadow-[0_0_15px_rgba(59,130,246,0.5)] p-2"><span>Mint Address</span></div>
@@ -81,6 +97,7 @@ function Tokens() {
           <div className="flex border border-purple-500 shadow-[0_0_15px_rgba(59,130,246,0.5)] p-2 justify-center"><span>{`${JSON.stringify(tokenAccount.account.data.parsed.info.tokenAmount.uiAmount)}`}</span></div>
         </div>
       })}
+    </div>
     </div>
   )
 }
