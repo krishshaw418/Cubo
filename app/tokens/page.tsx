@@ -70,19 +70,33 @@ function Tokens() {
   }
 
   return (
-    <div className="flex flex-col">
-      <Button type="button" variant="ghost" onClick={async () => {
-        try {
-          const signature = await createMint();
-          if (signature) {
-            toast.success("Transaction successful!");
-          } else {
-            toast.error("Transaction failed!");
+    <div className="flex flex-col gap-5 p-5"
+      style={{
+        height: `calc(100vh - ${height}px)`,
+        fontFamily: "Orbitron, sans-serif",
+        letterSpacing: "3px"
+      }}>
+      <div className="flex justify-end">
+        <Button type="button" variant="ghost" onClick={async () => {
+          try {
+            const signature = await createMint();
+            if (signature) {
+              toast.success("Transaction successful!");
+            } else {
+              toast.error("Transaction failed!");
+            }
+          } catch (error: any) {
+            toast.error(`Transaction failed: ${error.message}`);
           }
-        } catch (error: any) {
-          toast.error(`Transaction failed: ${error.message}`);
-        }
-      }} className="">Create Token</Button>
+        }} className="w-50" style={{
+          backgroundImage: 'linear-gradient(135deg, #21e47f 0%, #68c4f6 100%)',
+          WebkitTextFillColor: 'transparent',
+          WebkitBackgroundClip: 'text',
+          borderRadius: '10px',
+          width: '250px',
+          boxShadow: '0 0 5px #00FFFF, 0 0 5px #14F195',
+        }}>Create Token</Button>
+      </div>
       <div className="px-5 text-cyan-300 text-shadow-lg filter drop-shadow-lg drop-shadow-green-500/50 border border-cyan-300 shadow-[0_0_15px_rgba(59,130,246,0.5)]">
       <div className="grid grid-cols-3 py-5">
         <div className="flex justify-center border border-purple-500 shadow-[0_0_15px_rgba(59,130,246,0.5)] p-2"><span>Public Key</span></div>
