@@ -6,8 +6,9 @@ import { useEffect, useState } from "react";
 import Spinner from "@/components/ui/load-spinner";
 import { toast } from "sonner";
 import { calculateHeight } from "@/lib/navBarHeight";
-import { useMint } from "@/lib/mint";
+import { useCreateToken } from "@/lib/createToken";
 import { Button } from "@/components/ui/button";
+import { redirect } from "next/navigation";
 
 function Tokens() {
   const { connection } = useConnection();
@@ -19,7 +20,7 @@ function Tokens() {
     account: AccountInfo<ParsedAccountData>;
   }[] | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(true);
-  const { createMint } = useMint();
+  const { createToken } = useCreateToken();
 
   useEffect(() => {
     setHeight(calculateHeight());
@@ -55,6 +56,9 @@ function Tokens() {
   useEffect(() => {
     if (!isConnected) {
       toast.warning("Connect wallet to see your tokens!");
+      setTimeout(() => {
+        redirect("/");
+      }, 1000);
     }
   }, [isConnected])
 
@@ -79,8 +83,8 @@ function Tokens() {
       <div className="flex justify-end">
         <Button type="button" variant="ghost" onClick={async () => {
           try {
-            const signature = await createMint();
-            if (signature) {
+            const result = await createToken();
+            if (result) {
               toast.success("Transaction successful!");
             } else {
               toast.error("Transaction failed!");
