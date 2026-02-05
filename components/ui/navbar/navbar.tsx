@@ -42,7 +42,7 @@ function Navbar() {
           WebkitBackgroundClip: 'text',
           borderRadius: '10px',
           width: '100%',
-          boxShadow: '0 0 5px #00FFFF, 0 0 5px #14F195',
+          boxShadow: '0 0 4px #00FFFF, 0 0 4px #14F195',
           letterSpacing: "3px"
         }} />
         {/* <ModeToggle/> */}
