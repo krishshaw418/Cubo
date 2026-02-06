@@ -1,8 +1,8 @@
 diff --git a/node_modules/@solana/wallet-adapter-react-ui/styles.css b/node_modules/@solana/wallet-adapter-react-ui/styles.css
-index 10c54b1..0150137 100644
+index 10c54b1..207c6b8 100644
 --- a/node_modules/@solana/wallet-adapter-react-ui/styles.css
 +++ b/node_modules/@solana/wallet-adapter-react-ui/styles.css
-@@ -71,15 +71,34 @@
+@@ -71,15 +71,32 @@
      padding: 10px;
      top: 100%;
      right: 0;
@@ -12,12 +12,12 @@ index 10c54b1..0150137 100644
 -    background: #2c2d30;
 +    background: #171617;
      border-radius: 10px;
-     box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.6);
+-    box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.6);
      opacity: 0;
      visibility: hidden;
      transition: opacity 200ms ease, transform 200ms ease, visibility 200ms;
      font-family: 'DM Sans', 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-+    box-shadow: 0 0 5px #00FFFF, 0 0 5px #14F195;
++    box-shadow: 0 0 15px #00FFFF, 0 0 15px #14F195;
 +}
 +
 +.wallet-adapter-dropdown-list::before {
@@ -25,7 +25,6 @@ index 10c54b1..0150137 100644
 +    position: absolute;
 +    inset: 0;
 +    border-radius: 10px;
-+    padding: 1.1px; /* This controls the border thickness */
 +    background: linear-gradient(to right, #21e47f, #00FFFF);
 +    -webkit-mask: 
 +        linear-gradient(#fff 0 0) content-box, 
@@ -39,7 +38,7 @@ index 10c54b1..0150137 100644
  }
  
  .wallet-adapter-dropdown-list-active {
-@@ -102,13 +121,26 @@
+@@ -102,18 +119,31 @@
      width: 100%;
      border-radius: 6px;
      font-size: 14px;
@@ -69,20 +68,42 @@ index 10c54b1..0150137 100644
  }
  
  .wallet-adapter-modal-collapse-button svg {
-@@ -198,12 +230,39 @@
+     align-self: center;
+-    fill: #999;
++    fill: #00FFFF;
+ }
+ 
+ .wallet-adapter-modal-collapse-button.wallet-adapter-modal-collapse-button-active svg {
+@@ -157,12 +187,12 @@
+ }
+ 
+ .wallet-adapter-modal-button-close svg {
+-    fill: #777;
++    fill: #199463;;
+     transition: fill 200ms ease 0s;
+ }
+ 
+ .wallet-adapter-modal-button-close:hover svg {
+-    fill: #fff;
++    fill: #00FFFF;
+ }
+ 
+ .wallet-adapter-modal-overlay {
+@@ -198,10 +228,36 @@
      z-index: 1050;
      max-width: 400px;
      border-radius: 10px;
 -    background: #10141f;
-+    background: #171617;
-     box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.6);
+-    box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.6);
 -    font-family: 'DM Sans', 'Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif;
++    background: #171617;
 +    font-family: 'Orbitron', sans-serif;
 +    font-size: 14px;
 +    letter-spacing: 3px;
      flex: 1;
- }
- 
++    box-shadow: 0 0 15px #00FFFF, 0 0 15px #14F195;
++}
++
 +.wallet-adapter-modal-wrapper * {
 +    background: linear-gradient(135deg, #21e47f 0%, #00FFFF 100%);
 +    -webkit-background-clip: text;
@@ -95,7 +116,6 @@ index 10c54b1..0150137 100644
 +    position: absolute;
 +    inset: 0;
 +    border-radius: 10px;
-+    padding: 1.1px; /* This controls the border thickness */
 +    background: linear-gradient(to right, #21e47f, #00FFFF);
 +    -webkit-mask: 
 +        linear-gradient(#fff 0 0) content-box, 
@@ -106,8 +126,29 @@ index 10c54b1..0150137 100644
 +    -webkit-mask-composite: xor;
 +    mask-composite: exclude;
 +    pointer-events: none;
+ }
+ 
+ .wallet-adapter-modal-wrapper .wallet-adapter-button {
+@@ -235,6 +291,7 @@
+     font-weight: 400;
+     border-radius: 0;
+     font-size: 18px;
++    font-family: 'Orbitron', sans-serif;
+ }
+ 
+ .wallet-adapter-modal-list .wallet-adapter-button-end-icon,
+@@ -249,8 +306,14 @@
+     margin-left: auto;
+     font-size: 14px;
+     opacity: .6;
++    text-shadow: none;
+ }
+ 
++.wallet-adapter-button:hover {
++    text-shadow: 1px 1px 2px #00FFFF;
 +}
 +
- .wallet-adapter-modal-wrapper .wallet-adapter-button {
-     width: 100%;
- }
++
+ .wallet-adapter-modal-list-more {
+     cursor: pointer;
+     border: none;
