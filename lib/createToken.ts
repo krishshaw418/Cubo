@@ -14,7 +14,7 @@ import {
     TOKEN_PROGRAM_ID,
     ASSOCIATED_TOKEN_PROGRAM_ID,
     MintLayout,
-    getAssociatedTokenAddress
+    getAssociatedTokenAddressSync
 } from "@solana/spl-token";
 
 export function useCreateToken() {
@@ -58,7 +58,7 @@ export function useCreateToken() {
             console.log("Mint Address:", mint.publicKey.toBase58());
             console.log("Mint Txn Signature:", mintTxSignature);
 
-            const associatedTokenAccount = await getAssociatedTokenAddress(
+            const associatedTokenAccount = getAssociatedTokenAddressSync(
                 mint.publicKey,
                 publicKey,
                 false, // allowOwnerOffCurve

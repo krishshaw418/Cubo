@@ -2,13 +2,14 @@
 import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { PublicKey, AccountInfo, ParsedAccountData } from "@solana/web3.js";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Spinner from "@/components/ui/load-spinner";
 import { toast } from "sonner";
 import { calculateHeight } from "@/lib/navBarHeight";
 import { useCreateToken } from "@/lib/createToken";
 import { Button } from "@/components/ui/button";
 import { redirect } from "next/navigation";
+import { useMintToken } from "@/lib/mintToken";
 
 function Tokens() {
   const { connection } = useConnection();
@@ -21,6 +22,8 @@ function Tokens() {
   }[] | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(true);
   const { createToken } = useCreateToken();
+  const spanRef = useRef(null);
+  const { mintTokens } = useMintToken();
 
   useEffect(() => {
     setHeight(calculateHeight());
@@ -111,7 +114,18 @@ function Tokens() {
       {tokenAccounts?.length !== 0 && tokenAccounts?.map((tokenAccount, id) => {
         return <div className="grid grid-cols-3 py-5" key={id}>
           <div className="flex border border-purple-500 shadow-[0_0_15px_rgba(59,130,246,0.5)] p-2"><span className="truncate w-50 md:w-full px-[20%]">{`${tokenAccount.pubkey}`}</span></div>
-          <div className="flex border border-purple-500 shadow-[0_0_15px_rgba(59,130,246,0.5)] p-2"><span className="truncate w-50 md:w-full px-[20%]">{`${JSON.stringify(tokenAccount.account.data.parsed.info.mint).replace(/^(['"])(.*)\1$/, '$2')}`}</span></div>
+          <div className="flex border border-purple-500 shadow-[0_0_15px_rgba(59,130,246,0.5)] p-2"><span className="truncate w-50 md:w-full px-[20%]" ref={spanRef} onClick={async (e: React.MouseEvent<HTMLSpanElement, MouseEvent>) => {
+            const mintAddress = new PublicKey(e.currentTarget.textContent);
+            if (mintAddress) {
+              alert(`Mint Address: ${e.currentTarget.textContent}`);
+              const signature = await mintTokens(mintAddress, 100);
+              if (signature) {
+                toast.success("100 tokens minted sucessfully!");
+              } else {
+                toast.error("Something went wrong!");
+              }
+            }
+          }}>{`${JSON.stringify(tokenAccount.account.data.parsed.info.mint).replace(/^(['"])(.*)\1$/, '$2')}`}</span></div>
           <div className="flex border border-purple-500 shadow-[0_0_15px_rgba(59,130,246,0.5)] p-2 justify-center"><span>{`${JSON.stringify(tokenAccount.account.data.parsed.info.tokenAmount.uiAmount)}`}</span></div>
         </div>
       })}
