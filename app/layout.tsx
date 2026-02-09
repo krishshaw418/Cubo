@@ -38,7 +38,15 @@ export default function RootLayout({
         <SolanaProvider>
           <Navbar />
           {children}
-          <Toaster />
+          <Toaster toastOptions={{
+            style: {
+              border: '1px solid transparent',
+              borderRadius: '10px',
+              boxShadow: '0 0 5px #00FFFF, 0 0 5px #14F195',
+              fontFamily: "Orbitron, sans-serif",
+              color: "cyan"
+            }
+          }}/>
         </SolanaProvider>
       </body>
     </html>
