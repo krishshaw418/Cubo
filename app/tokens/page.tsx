@@ -10,6 +10,7 @@ import { useCreateToken } from "@/lib/createToken";
 import { Button } from "@/components/ui/button";
 import { redirect } from "next/navigation";
 import { useMintToken } from "@/lib/mintToken";
+import { Copy } from "lucide-react";
 
 function Tokens() {
   const { connection } = useConnection();
@@ -22,7 +23,8 @@ function Tokens() {
   }[] | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(true);
   const { createToken } = useCreateToken();
-  const spanRef = useRef(null);
+  const spanRefs1 = useRef<(HTMLSpanElement | null)[]>([]);
+  const spanRefs2 = useRef<(HTMLSpanElement | null)[]>([]);
   const { mintTokens } = useMintToken();
 
   useEffect(() => {
@@ -76,6 +78,38 @@ function Tokens() {
     </div>)
   }
 
+  const handleCopy1 = async (id: number) => {
+    try {
+      if (spanRefs1.current) {
+        const publicKey = spanRefs1.current[id]?.textContent;
+        console.log(publicKey);
+        if (publicKey) {
+          await navigator.clipboard.writeText(publicKey);
+          toast.success("Copied to clipboard!");
+        }    
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      toast.error("Failed to copy to clipboard!");
+    }
+  }
+
+  const handleCopy2 = async (id: number) => {
+    try {
+      if (spanRefs1.current) {
+        const publicKey = spanRefs2.current[id]?.textContent;
+        console.log(publicKey);
+        if (publicKey) {
+          await navigator.clipboard.writeText(publicKey);
+          toast.success("Copied to clipboard!");
+        }    
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      toast.error("Failed to copy to clipboard!");
+    }
+  }
+
   return (
     <div className="flex flex-col gap-5 p-5"
       style={{
@@ -106,15 +140,17 @@ function Tokens() {
       </div>
       <div className="px-5 text-cyan-300 text-shadow-lg filter drop-shadow-lg drop-shadow-green-500/50 border border-cyan-300 shadow-[0_0_15px_rgba(59,130,246,0.5)]">
       <div className="grid grid-cols-3 py-5">
-        <div className="flex justify-center border border-purple-500 shadow-[0_0_15px_rgba(59,130,246,0.5)] p-2"><span>Public Key</span></div>
+        <div className="flex justify-center border border-purple-500 shadow-[0_0_15px_rgba(59,130,246,0.5)] p-2"><span>Token Account</span></div>
         <div className="flex justify-center border border-purple-500 shadow-[0_0_15px_rgba(59,130,246,0.5)] p-2"><span>Mint Address</span></div>
         <div className="flex justify-center border border-purple-500 shadow-[0_0_15px_rgba(59,130,246,0.5)] p-2"><span>Amount</span></div>
       </div>
       {isLoading && <Spinner/>}
       {tokenAccounts?.length !== 0 && tokenAccounts?.map((tokenAccount, id) => {
         return <div className="grid grid-cols-3 py-5" key={id}>
-          <div className="flex border border-purple-500 shadow-[0_0_15px_rgba(59,130,246,0.5)] p-2"><span className="truncate w-50 md:w-full px-[20%]">{`${tokenAccount.pubkey}`}</span></div>
-          <div className="flex border border-purple-500 shadow-[0_0_15px_rgba(59,130,246,0.5)] p-2"><span className="truncate w-50 md:w-full px-[20%]" ref={spanRef} onClick={async (e: React.MouseEvent<HTMLSpanElement, MouseEvent>) => {
+          <div className="flex gap-2 border border-purple-500 shadow-[0_0_15px_rgba(59,130,246,0.5)] px-5 py-2"><span className="truncate w-50 md:w-full" ref={(el) => { spanRefs2.current[id] = el }}>{`${tokenAccount.pubkey}`}</span><span>
+            <Copy onClick={() => handleCopy2(id)}/>
+          </span></div>
+          <div className="flex gap-2 border border-purple-500 shadow-[0_0_15px_rgba(59,130,246,0.5)] px-5 py-2"><span className="truncate w-50 md:w-full" ref={(el) => { spanRefs1.current[id] = el }} onClick={async (e: React.MouseEvent<HTMLSpanElement, MouseEvent>) => {
             const mintAddress = new PublicKey(e.currentTarget.textContent);
             if (mintAddress) {
               alert(`Mint Address: ${e.currentTarget.textContent}`);
@@ -125,7 +161,9 @@ function Tokens() {
                 toast.error("Something went wrong!");
               }
             }
-          }}>{`${JSON.stringify(tokenAccount.account.data.parsed.info.mint).replace(/^(['"])(.*)\1$/, '$2')}`}</span></div>
+          }}>{`${JSON.stringify(tokenAccount.account.data.parsed.info.mint).replace(/^(['"])(.*)\1$/, '$2')}`}</span><span>
+            <Copy onClick={() => handleCopy1(id)}/>
+          </span></div>
           <div className="flex border border-purple-500 shadow-[0_0_15px_rgba(59,130,246,0.5)] p-2 justify-center"><span>{`${JSON.stringify(tokenAccount.account.data.parsed.info.tokenAmount.uiAmount)}`}</span></div>
         </div>
       })}
