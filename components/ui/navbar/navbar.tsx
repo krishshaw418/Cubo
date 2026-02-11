@@ -49,7 +49,7 @@ function Navbar() {
       </div>
       <div className="flex items-center gap-2 md:hidden">
         {/* <ModeToggle /> */}
-        <MenuIcon/>
+        <MenuIcon className="text-[#29BA8B]"/>
       </div>
     </nav>
   )

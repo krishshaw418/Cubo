@@ -110,6 +110,19 @@ function Tokens() {
     }
   }
 
+  const handleCreate = async () => {
+    try {
+      const result = await createToken();
+      if (result) {
+        toast.success("Transaction successful!");
+      } else {
+        toast.error("Transaction failed!");
+      }
+    } catch (error: any) {
+      toast.error(`Transaction failed: ${error.message}`);
+    }
+  }
+
   return (
     <div className="flex flex-col gap-5 p-5"
       style={{
@@ -118,18 +131,7 @@ function Tokens() {
         letterSpacing: "3px"
       }}>
       <div className="flex justify-end">
-        <Button type="button" variant="ghost" onClick={async () => {
-          try {
-            const result = await createToken();
-            if (result) {
-              toast.success("Transaction successful!");
-            } else {
-              toast.error("Transaction failed!");
-            }
-          } catch (error: any) {
-            toast.error(`Transaction failed: ${error.message}`);
-          }
-        }} className="w-50" style={{
+        <Button type="button" variant="ghost" onClick={() => handleCreate()} className="w-50" style={{
           backgroundImage: 'linear-gradient(135deg, #21e47f 0%, #68c4f6 100%)',
           WebkitTextFillColor: 'transparent',
           WebkitBackgroundClip: 'text',
