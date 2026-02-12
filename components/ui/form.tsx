@@ -15,17 +15,14 @@ import { Button } from "@/components/ui/button"
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
-  CardHeader,
-  CardTitle,
 } from "@/components/ui/card"
 
 const formSchema = z.object({
     name: z.string().min(3, "Minimum 3 characters required").max(32, "Upto 32 characters allowed"),
     symbol: z.string().min(1, "Minimum 1 character required").max(8, "Upto 8 characters allowed"),
     decimals: z.number().min(1, "Minimum 1 decimal required").max(9, "Upto 9 decimals allowed"),
-    supply: z.number().min(1, "Minimum 1 token required").max(100000000000000, "Upto 1B allowed at a time"),
+    supply: z.number().min(1, "Minimum 1 token required").max(1000000000, "Upto 1B allowed at a time"),
     description: z.string().min(20, "Minimum 20 characters required").max(500, "Maximum 500 characters allowed"),
     image: z.string().url("Invalid url")
 })
@@ -45,10 +42,21 @@ function TokenMetadataForm() {
     })
 
     function onSubmit(data: z.infer<typeof formSchema>) {
-        
+        console.log(data);
     }
   return (
-    <Card className="w-full sm:max-w-2xl">
+    <Card className="w-full border-0 sm:max-w-2xl" style={
+          {
+            fontFamily: 'Orbitron, sans-serif',
+            backgroundImage: 'linear-gradient(135deg, #21e47f 0%, #68c4f6 100%)',
+            WebkitTextFillColor: 'transparent',
+            WebkitBackgroundClip: 'text',
+            borderRadius: '15px',
+            width: '100%',
+            boxShadow: '0 0 10px #00FFFF, 0 0 10px #14F195',
+            letterSpacing: "3px"
+          }
+        }>
         <CardContent>
             <form id="token-metadata-form" onSubmit={form.handleSubmit(onSubmit)}>
                 <FieldGroup>
@@ -57,7 +65,7 @@ function TokenMetadataForm() {
                         control={form.control}
                         render={({ field, fieldState }) => (
                             <Field data-invalid={fieldState.invalid}>
-                                <FieldLabel htmlFor="token-name">
+                                <FieldLabel htmlFor="token-name" >
                                     Name
                                 </FieldLabel>
                                 <Input
@@ -66,6 +74,18 @@ function TokenMetadataForm() {
                                     aria-invalid={fieldState.invalid}
                                     placeholder="Ex: Solana"
                                     autoComplete="off"
+                                    style={{
+                                        fontFamily: 'Orbitron, sans-serif',
+                                        backgroundImage: 'linear-gradient(135deg, #21e47f 0%, #68c4f6 100%)',
+                                        WebkitTextFillColor: 'transparent',
+                                        WebkitBackgroundClip: 'text',
+                                        borderRadius: '10px',
+                                        width: '100%',
+                                        boxShadow: '0 0 4px #00FFFF, 0 0 4px #14F195',
+                                        letterSpacing: "3px",
+                                        border: 0,
+                                    }}
+                                    className="placeholder:bg-linear-to-r placeholder:from-[#21e47f] placeholder:to-[#68c4f6] placeholder:bg-clip-text placeholder:text-xs placeholder:text-transparent placeholder:opacity-80 gradient-input"
                                 />
                                 {fieldState.invalid && (
                                     <FieldError errors={[fieldState.error]}/>
@@ -87,6 +107,19 @@ function TokenMetadataForm() {
                                     aria-invalid={fieldState.invalid}
                                     placeholder="Ex: SOL"
                                     autoComplete="off"
+                                    style={{
+                                        fontFamily: 'Orbitron, sans-serif',
+                                        backgroundImage: 'linear-gradient(135deg, #21e47f 0%, #68c4f6 100%)',
+                                        WebkitTextFillColor: 'transparent',
+                                        WebkitBackgroundClip: 'text',
+                                        borderRadius: '10px',
+                                        width: '100%',
+                                        boxShadow: '0 0 4px #00FFFF, 0 0 4px #14F195',
+                                        letterSpacing: "3px",
+                                        border: 0,
+                                        textTransform: "uppercase"
+                                    }}
+                                    className="placeholder:bg-linear-to-r placeholder:from-[#21e47f] placeholder:to-[#68c4f6] placeholder:bg-clip-text placeholder:text-xs placeholder:text-transparent placeholder:opacity-80 gradient-input"
                                 />
                                 {fieldState.invalid && (
                                     <FieldError errors={[fieldState.error]}/>
@@ -105,12 +138,26 @@ function TokenMetadataForm() {
                                 <Input
                                     {...field}
                                     id="token-decimals"
+                                    type="number"
                                     aria-invalid={fieldState.invalid}
                                     placeholder="6"
                                     autoComplete="off"
+                                    onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                                    style={{
+                                        fontFamily: 'Orbitron, sans-serif',
+                                        backgroundImage: 'linear-gradient(135deg, #21e47f 0%, #68c4f6 100%)',
+                                        WebkitTextFillColor: 'transparent',
+                                        WebkitBackgroundClip: 'text',
+                                        borderRadius: '10px',
+                                        width: '100%',
+                                        boxShadow: '0 0 4px #00FFFF, 0 0 4px #14F195',
+                                        letterSpacing: "3px",
+                                        border: 0
+                                    }}
+                                    className="placeholder:bg-linear-to-r placeholder:from-[#21e47f] placeholder:to-[#68c4f6] placeholder:bg-clip-text placeholder:text-xs placeholder:text-transparent placeholder:opacity-80 gradient-input"
                                 />
                                 <FieldDescription>
-                                    Most token use 6 decimals.
+                                    Most tokens use 6 decimals.
                                 </FieldDescription>
                                 {fieldState.invalid && (
                                     <FieldError errors={[fieldState.error]}/>
@@ -129,13 +176,60 @@ function TokenMetadataForm() {
                                 <Input
                                     {...field}
                                     id="token-initial-supply"
+                                    type="number"
                                     aria-invalid={fieldState.invalid}
                                     placeholder="1"
                                     autoComplete="off"
+                                    onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                                    style={{
+                                        fontFamily: 'Orbitron, sans-serif',
+                                        backgroundImage: 'linear-gradient(135deg, #21e47f 0%, #68c4f6 100%)',
+                                        WebkitTextFillColor: 'transparent',
+                                        WebkitBackgroundClip: 'text',
+                                        borderRadius: '10px',
+                                        width: '100%',
+                                        boxShadow: '0 0 4px #00FFFF, 0 0 4px #14F195',
+                                        letterSpacing: "3px",
+                                        border: 0
+                                    }}
+                                    className="placeholder:bg-linear-to-r placeholder:from-[#21e47f] placeholder:to-[#68c4f6] placeholder:bg-clip-text placeholder:text-xs placeholder:text-transparent placeholder:opacity-80 gradient-input"
                                 />
                                 <FieldDescription>
                                     Most token use 10B
                                 </FieldDescription>
+                                {fieldState.invalid && (
+                                    <FieldError errors={[fieldState.error]}/>
+                                )}
+                            </Field>
+                        )}
+                    />
+                    <Controller
+                        name="image"
+                        control={form.control}
+                        render={({ field, fieldState }) => (
+                            <Field data-invalid={fieldState.invalid}>
+                                <FieldLabel htmlFor="token-image">
+                                    Image URL
+                                </FieldLabel>
+                                <Input
+                                    {...field}
+                                    id="token-image"
+                                    aria-invalid={fieldState.invalid}
+                                    placeholder="https://example.com/token-image.png"
+                                    autoComplete="off"
+                                    style={{
+                                        fontFamily: 'Orbitron, sans-serif',
+                                        backgroundImage: 'linear-gradient(135deg, #21e47f 0%, #68c4f6 100%)',
+                                        WebkitTextFillColor: 'transparent',
+                                        WebkitBackgroundClip: 'text',
+                                        borderRadius: '10px',
+                                        width: '100%',
+                                        boxShadow: '0 0 4px #00FFFF, 0 0 4px #14F195',
+                                        letterSpacing: "3px",
+                                        border: 0
+                                    }}
+                                    className="placeholder:bg-linear-to-r placeholder:from-[#21e47f] placeholder:to-[#68c4f6] placeholder:bg-clip-text placeholder:text-xs placeholder:text-transparent placeholder:opacity-80 gradient-input"
+                                />
                                 {fieldState.invalid && (
                                     <FieldError errors={[fieldState.error]}/>
                                 )}
@@ -150,18 +244,30 @@ function TokenMetadataForm() {
                                 <FieldLabel htmlFor="token-description">
                                     Description
                                 </FieldLabel>
-                                <InputGroup>
+                                <InputGroup
+                                    style={{
+                                        fontFamily: 'Orbitron, sans-serif',
+                                        backgroundImage: 'linear-gradient(135deg, #21e47f 0%, #68c4f6 100%)',
+                                        WebkitTextFillColor: 'transparent',
+                                        WebkitBackgroundClip: 'text',
+                                        borderRadius: '10px',
+                                        width: '100%',
+                                        boxShadow: '0 0 4px #00FFFF, 0 0 4px #14F195',
+                                        letterSpacing: "3px",
+                                        border: 0
+                                    }}
+                                >
                                     <InputGroupTextarea
                                         {...field}
                                         id="token-description"
                                         placeholder="Ex: The first community token on Solana..."
                                         autoComplete="off"
                                         rows={6}
-                                        className="min-h-24 resize-none"
                                         aria-invalid={fieldState.invalid}
+                                        className="min-h-24 resize-none placeholder:bg-linear-to-r placeholder:from-[#21e47f] placeholder:to-[#68c4f6] placeholder:bg-clip-text placeholder:text-xs placeholder:text-transparent placeholder:opacity-80 gradient-input"
                                     />
                                     <InputGroupAddon align="block-end">
-                                        <InputGroupText className="tabular-nums">
+                                        <InputGroupText className="tabular-nums text-xs">
                                             {field.value.length}/500 characters
                                         </InputGroupText>
                                     </InputGroupAddon>
@@ -176,7 +282,16 @@ function TokenMetadataForm() {
             </form>
         </CardContent>
         <CardFooter className="flex justify-center">
-            <Button type="submit" form="token-metadata-form">Create Token</Button>
+            <Button type="submit" form="token-metadata-form" style={{
+                fontFamily: 'Orbitron, sans-serif',
+                backgroundImage: 'linear-gradient(135deg, #21e47f 0%, #68c4f6 100%)',
+                WebkitTextFillColor: 'transparent',
+                WebkitBackgroundClip: 'text',
+                borderRadius: '10px',
+                // width: '100%',
+                boxShadow: '0 0 4px #00FFFF, 0 0 4px #14F195',
+                letterSpacing: "3px"
+            }}>Create Token</Button>
         </CardFooter>
     </Card>
   )
