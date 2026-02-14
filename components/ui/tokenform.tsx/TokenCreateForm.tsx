@@ -11,11 +11,9 @@ import {
   FieldGroup,
   FieldLabel,
 } from "@/components/ui/field"
-import { Button } from "@/components/ui/button"
 import {
   Card,
   CardContent,
-  CardFooter,
 } from "@/components/ui/card"
 import "./TokenCreateForm.css";
 
@@ -28,7 +26,7 @@ const formSchema = z.object({
     image: z.string().url("Invalid url")
 })
 
-function TokenMetadataForm() {
+function TokenMetadataForm(props:{ id: string }) {
 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
@@ -48,7 +46,7 @@ function TokenMetadataForm() {
   return (
       <Card className="border-0 bg-transparent text-white">
         <CardContent>
-            <form id="token-metadata-form" onSubmit={form.handleSubmit(onSubmit)}>
+            <form id={props.id} onSubmit={form.handleSubmit(onSubmit)}>
                 <FieldGroup>
                     <Controller
                         name="name"
@@ -111,6 +109,7 @@ function TokenMetadataForm() {
                                     autoComplete="off"
                                     onChange={(e) => field.onChange(parseFloat(e.target.value))}
                                     className="input-box"
+                                    min={1}
                                 />
                                 <FieldDescription>
                                     Most tokens use 6 decimals.
@@ -138,6 +137,7 @@ function TokenMetadataForm() {
                                     autoComplete="off"
                                     onChange={(e) => field.onChange(parseFloat(e.target.value))}
                                     className="input-box"
+                                    min={1}
                                 />
                                 <FieldDescription>
                                     Most token use 10B
@@ -202,18 +202,6 @@ function TokenMetadataForm() {
                 </FieldGroup>
             </form>
         </CardContent>
-        <CardFooter className="flex justify-center">
-            <Button type="submit" form="token-metadata-form" style={{
-                fontFamily: 'Orbitron, sans-serif',
-                backgroundImage: 'linear-gradient(135deg, #21e47f 0%, #68c4f6 100%)',
-                WebkitTextFillColor: 'transparent',
-                WebkitBackgroundClip: 'text',
-                borderRadius: '10px',
-                // width: '100%',
-                boxShadow: '0 0 4px #00FFFF, 0 0 4px #14F195',
-                letterSpacing: "3px"
-            }}>Create Token</Button>
-        </CardFooter>
     </Card>
   )
 }

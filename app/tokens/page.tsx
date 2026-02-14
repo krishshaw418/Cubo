@@ -11,8 +11,9 @@ import { Button } from "@/components/ui/button";
 import { redirect } from "next/navigation";
 import { useMintToken } from "@/lib/mintToken";
 import { Copy } from "lucide-react";
-import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import TokenMetadataForm from "@/components/ui/tokenform.tsx/TokenCreateForm";
+import "./page.css"
 
 function Tokens() {
   const { connection } = useConnection();
@@ -112,18 +113,18 @@ function Tokens() {
     }
   }
 
-  // const handleCreate = async () => {
-  //   try {
-  //     const result = await createToken();
-  //     if (result) {
-  //       toast.success("Transaction successful!");
-  //     } else {
-  //       toast.error("Transaction failed!");
-  //     }
-  //   } catch (error: any) {
-  //     toast.error(`Transaction failed: ${error.message}`);
-  //   }
-  // }
+  const handleCreate = async () => {
+    try {
+      const result = await createToken();
+      if (result) {
+        toast.success("Transaction successful!");
+      } else {
+        toast.error("Transaction failed!");
+      }
+    } catch (error: any) {
+      toast.error(`Transaction failed: ${error.message}`);
+    }
+  }
 
   return (
     <div className="flex flex-col gap-5 p-5"
@@ -144,14 +145,28 @@ function Tokens() {
               boxShadow: '0 0 5px #00FFFF, 0 0 5px #14F195',
             }}>Create Token</Button>
           </DialogTrigger>
-          <DialogContent showCloseButton={false} className="h-[70%] w-full overflow-y-auto border-0" style={{
+          <DialogContent aria-describedby="form-content" showCloseButton={false} className="w-full border-0" style={{
             fontFamily: 'Orbitron, sans-serif',
             boxShadow: '0 0 10px #00FFFF, 0 0 10px #14F195',
           }}>
             <DialogHeader className="flex items-center">
               <DialogTitle className="bg-linear-to-tr from-[#00FFFF] to-[#14F195] bg-clip-text text-transparent font-bold text-xl">Launch your token</DialogTitle>
             </DialogHeader>
-            <TokenMetadataForm/>
+            <div className="no-scrollbar -mx-4 max-h-[67vh] overflow-y-auto px-4">
+              {/* {Array.from({ length: 10 }).map((_, index) =>(<TokenMetadataForm />))} */}
+              <TokenMetadataForm id="token-metadata-form"/>
+            </div>
+            <DialogFooter>
+              <Button type="submit" form="token-metadata-form" style={{
+                  fontFamily: 'Orbitron, sans-serif',
+                  backgroundImage: 'linear-gradient(135deg, #21e47f 0%, #68c4f6 100%)',
+                  WebkitTextFillColor: 'transparent',
+                  WebkitBackgroundClip: 'text',
+                  borderRadius: '10px',
+                  boxShadow: '0 0 4px #00FFFF, 0 0 4px #14F195',
+                  letterSpacing: "3px"
+              }}>Launch</Button>
+            </DialogFooter>
           </DialogContent>
         </Dialog>
       </div>
@@ -172,6 +187,7 @@ function Tokens() {
             if (mintAddress) {
               alert(`Mint Address: ${e.currentTarget.textContent}`);
               const signature = await mintTokens(mintAddress, 100);
+              // console.log(signature);
               if (signature) {
                 toast.success("100 tokens minted sucessfully!");
               } else {
