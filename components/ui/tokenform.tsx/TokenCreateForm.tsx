@@ -16,18 +16,44 @@ import {
   CardContent,
 } from "@/components/ui/card"
 import "./TokenCreateForm.css";
+import DropZone from "../dropzone";
+import { useDropzone } from "react-dropzone";
 
+// image file type validation
+const imageSchema = z.instanceof(File).refine((file) => (
+    [
+        "image/png",
+        "image/jpg",
+        "image/gif"
+    ].includes(file.type),
+    { message: "Invalid image type" }
+)).nullable();
+
+// form field validation
 const formSchema = z.object({
     name: z.string().min(3, "Minimum 3 characters required").max(32, "Upto 32 characters allowed"),
     symbol: z.string().min(1, "Minimum 1 character required").max(8, "Upto 8 characters allowed"),
     decimals: z.number().min(1, "Minimum 1 decimal required").max(9, "Upto 9 decimals allowed"),
     supply: z.number().min(1, "Minimum 1 token required").max(1000000000, "Upto 1B allowed at a time"),
     description: z.string().min(20, "Minimum 20 characters required").max(500, "Maximum 500 characters allowed"),
-    image: z.string().url("Invalid url")
+    image: imageSchema
 })
 
-function TokenMetadataForm(props:{ id: string }) {
+function TokenMetadataForm(props: { id: string }) {
+    
+    // react-dropzone for image
+    const { acceptedFiles, getInputProps, getRootProps } = useDropzone({
+        maxFiles: 1, // number of files allowed
+        accept: { 'image/*': [] }, // file type
+        // onDrop function to update the form's image field on image drop
+        onDrop: (acceptedFiles) => {
+            form.setValue('image', acceptedFiles[0] ?? null, {
+                shouldValidate: true,
+            })
+        }
+    });
 
+    // react-form hook
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -36,13 +62,14 @@ function TokenMetadataForm(props:{ id: string }) {
             decimals: 6,
             supply: 1,
             description: "",
-            image: ""
+            image: null
         }
     })
 
     function onSubmit(data: z.infer<typeof formSchema>) {
         console.log(data);
     }
+
   return (
       <Card className="border-0 bg-transparent text-white">
         <CardContent>
@@ -110,6 +137,7 @@ function TokenMetadataForm(props:{ id: string }) {
                                     onChange={(e) => field.onChange(parseFloat(e.target.value))}
                                     className="input-box"
                                     min={1}
+                                    max={9}
                                 />
                                 <FieldDescription>
                                     Most tokens use 6 decimals.
@@ -138,6 +166,7 @@ function TokenMetadataForm(props:{ id: string }) {
                                     onChange={(e) => field.onChange(parseFloat(e.target.value))}
                                     className="input-box"
                                     min={1}
+                                    max={1000000000}
                                 />
                                 <FieldDescription>
                                     Most token use 10B
@@ -156,14 +185,29 @@ function TokenMetadataForm(props:{ id: string }) {
                                 <FieldLabel htmlFor="token-image" className="label">
                                     Image URL
                                 </FieldLabel>
-                                <Input
-                                    {...field}
-                                    id="token-image"
-                                    aria-invalid={fieldState.invalid}
-                                    placeholder="https://example.com/token-image.png"
-                                    autoComplete="off"
-                                    className="input-box"
-                                />
+                                <div
+                                    {...getRootProps()}
+                                    className={`input-box p-4 rounded-lg border-2 border-dashed text-center cursor-pointer ${
+                                    fieldState.invalid ? 'border-red-500' : 'border-gray-300'
+                                    }`}
+                                >
+                                    {/* getInputProps handles type, accept, onChange internally */}
+                                    <Input {...getInputProps()} id="token-image" />
+                                    <p className="text-sm text-[#606060]">
+                                    Drag 'n' drop token image here, or click to select files. Required types are .png, .jpg, .gif
+                                    </p>
+                                </div>
+                                <aside>
+                                    {acceptedFiles.length > 0 && (
+                                    <ul>
+                                        {acceptedFiles.map((file) => (
+                                        <li key={file.name} className="text-sm">
+                                            {file.name} - {file.size} bytes
+                                        </li>
+                                        ))}
+                                    </ul>
+                                    )}
+                                </aside>
                                 {fieldState.invalid && (
                                     <FieldError errors={[fieldState.error]}/>
                                 )}
