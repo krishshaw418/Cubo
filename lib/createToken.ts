@@ -11,13 +11,13 @@ import {
     createInitializeMintInstruction,
     createAssociatedTokenAccountInstruction,
     MINT_SIZE,
-    TOKEN_PROGRAM_ID,
+    TOKEN_2022_PROGRAM_ID,
     ASSOCIATED_TOKEN_PROGRAM_ID,
     MintLayout,
     getAssociatedTokenAddressSync
 } from "@solana/spl-token";
 
-export function useCreateToken() {
+export function useCreateToken(props : { decimal: number, initialSupply: number }) {
     const { connection } = useConnection();
     const {publicKey, sendTransaction} = useWallet();
 
@@ -38,15 +38,15 @@ export function useCreateToken() {
                 newAccountPubkey: mint.publicKey,
                 space: MINT_SIZE,
                 lamports: rentExempt,
-                programId: TOKEN_PROGRAM_ID
+                programId: TOKEN_2022_PROGRAM_ID
             });
 
             const initializeMintInstruction = createInitializeMintInstruction(
                 mint.publicKey, // mint pubkey
-                9, // decimals
+                props.decimal, // decimals
                 publicKey, // mint authority
                 publicKey, // freeze authority
-                TOKEN_PROGRAM_ID
+                TOKEN_2022_PROGRAM_ID
             );
 
             let transaction = new Transaction().add(createAccountInstruction, initializeMintInstruction);
@@ -62,7 +62,7 @@ export function useCreateToken() {
                 mint.publicKey,
                 publicKey,
                 false, // allowOwnerOffCurve
-                TOKEN_PROGRAM_ID,
+                TOKEN_2022_PROGRAM_ID,
                 ASSOCIATED_TOKEN_PROGRAM_ID
             );
 
@@ -72,7 +72,7 @@ export function useCreateToken() {
                 associatedTokenAccount, // associated token account address
                 publicKey, // owner
                 mint.publicKey, // mint
-                TOKEN_PROGRAM_ID,
+                TOKEN_2022_PROGRAM_ID,
                 ASSOCIATED_TOKEN_PROGRAM_ID
             );
 

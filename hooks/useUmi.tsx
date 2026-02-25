@@ -3,18 +3,20 @@ import { walletAdapterIdentity } from '@metaplex-foundation/umi-signer-wallet-ad
 import { useWallet, useConnection } from '@solana/wallet-adapter-react';
 import { irysUploader } from "@metaplex-foundation/umi-uploader-irys/web";
 
-const uploadImg = async () => {
+function useUmi() {
+
     const wallet = useWallet();
     const connection = useConnection();
     const umi = createUmi(connection.connection.rpcEndpoint);
 
     umi.use(walletAdapterIdentity(wallet));
-
-    // const [imgURI] = await umi.uploader.upload(["./uploads"],
-    //     {
-    //         onProgress: (percent) => {
-    //         console.log(`${percent * 100}% uploaded...`);
-    //     },
-    //     }
-    // );
+    umi.use(irysUploader());
+    
+    const umiInstance = () => {
+        return umi;
+    }
+    
+    return { umiInstance };
 }
+
+export default useUmi;

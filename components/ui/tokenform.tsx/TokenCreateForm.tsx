@@ -16,8 +16,11 @@ import {
   CardContent,
 } from "@/components/ui/card"
 import "./TokenCreateForm.css";
-import DropZone from "../dropzone";
 import { useDropzone } from "react-dropzone";
+import useUmi from "@/hooks/useUmi";
+import { createGenericFile } from "@metaplex-foundation/umi";
+// import * as fs from 'fs';
+import { toast } from "sonner";
 
 // image file type validation
 const imageSchema = z.instanceof(File).refine((file) => (
@@ -29,7 +32,7 @@ const imageSchema = z.instanceof(File).refine((file) => (
     { message: "Invalid image type" }
 )).nullable();
 
-// form field validation
+// form field validationwa
 const formSchema = z.object({
     name: z.string().min(3, "Minimum 3 characters required").max(32, "Upto 32 characters allowed"),
     symbol: z.string().min(1, "Minimum 1 character required").max(8, "Upto 8 characters allowed"),
@@ -66,8 +69,62 @@ function TokenMetadataForm(props: { id: string }) {
         }
     })
 
-    function onSubmit(data: z.infer<typeof formSchema>) {
+    const { umiInstance } = useUmi();
+
+    async function onSubmit(data: z.infer<typeof formSchema>) {
         console.log(data);
+
+        let image = null;
+        const imgArray = await data.image?.arrayBuffer();
+        const fileName = data.image?.name;
+
+        if (imgArray && fileName) {
+            const imgUint8Array = new Uint8Array(imgArray);
+            image = createGenericFile(imgUint8Array, fileName, {
+                contentType: data.image?.type
+            });
+            console.log(image);
+        }
+
+        if (image) {
+
+            // Image file upload to ipfs
+            const [imgURI] = await umiInstance().uploader.upload([image]);
+            console.log(imgURI);
+            if (imgURI) {
+                toast.success("Image upload successful!");
+            } else {
+                toast.error("Failed to upload token image!");
+                return;
+            }
+
+            const metadata = {
+                name: data.name,
+                description: data.description,
+                image: imgURI,
+                symbol: data.symbol
+            };
+
+            const encoder = new TextEncoder();
+            const metaDataUint8Array = encoder.encode(JSON.stringify(metadata));
+
+            const metaDataJsonFile = createGenericFile(metaDataUint8Array, "meta_data", {
+                contentType: "application/json"
+            });
+            
+            // meta_data.json file upload on ipfs
+            const [metaDataJsonURI] = await umiInstance().uploader.upload([metaDataJsonFile]);
+            console.log(metaDataJsonURI);
+            if (metaDataJsonURI) {
+                toast.success("Metadata upload successful!");
+            } else {
+                toast.error("Failed to upload metadata file!");
+                return;
+            }
+        } else {
+            toast.error("Image upload failed!");
+            return;
+        }
     }
 
   return (
