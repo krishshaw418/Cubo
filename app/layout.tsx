@@ -42,9 +42,9 @@ export default function RootLayout({
             style: {
               border: '1px solid transparent',
               borderRadius: '10px',
-              boxShadow: '0 0 5px #00FFFF, 0 0 5px #14F195',
+              boxShadow: '0 0 10px #00FFFF, 0 0 10px #14F195',
               fontFamily: "Orbitron, sans-serif",
-              color: "cyan"
+              color: '#00ffd0'
             }
           }}/>
         </SolanaProvider>

@@ -1,0 +1,12 @@
+
+.input-box{
+    border: 0;
+    box-shadow: 0 0 5px #00FFFF, 0 0 5px #14F195;
+}
+
+.label {
+    background-image: linear-gradient(135deg,  #14F195 0%, #00FFFF 25%);
+    -webkit-text-fill-color: transparent;
+    -webkit-background-clip: text;
+    background-clip: text;
+}

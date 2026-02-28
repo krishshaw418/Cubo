@@ -3,25 +3,30 @@ import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import "./navbar.css";
 import Image from "next/image";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-// import { ModeToggle } from "../modeToggle";
 import Link from "next/link";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { MenuIcon } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation"
 
 function Navbar() {
 
   const isConnected = useWallet().connected;
+  const pathname = usePathname() ?? "/";
+  const router = useRouter();
+
+  const tabValue = pathname === "/" ? "home" : pathname.startsWith("/tokens") ? "tokens" : "home";
 
   return (
     <nav id="navbar" aria-label="navbar" className="flex max-w-screen justify-between pr-5 top-0 z-50 sticky bg-neutral-800/30 backdrop-blur-lg">
-      <Link href="/">
-      <div className="flex items-center">
-        <Image src="/cubo-logo-centered.svg" alt="cubo-logo" width={70} height={70} className="cropped-svg"/>
+      <Link href="/" className="flex items-center">
+        <Image src="/logo.svg" alt="cubo-logo" width={70} height={70} className="cropped-svg"/>
         <div className="logo-text">CUBO</div>
-        </div>
       </Link>
       <div className="md:flex items-center gap-5 hidden">
-        {isConnected && <Tabs defaultValue="home">
+        {isConnected && <Tabs value={tabValue} onValueChange={(v) => {
+          if (v === "home") router.push("/");
+          else if (v === "tokens") router.push("/tokens");
+        }}>
           <TabsList variant="line">
             <Link href="/">
               <TabsTrigger value="home" className="tabs after:bg-linear-to-tr after:from-cyan-400 after:to-green-400">
@@ -29,7 +34,7 @@ function Navbar() {
               </TabsTrigger>
             </Link>
             <Link href="/tokens">
-              <TabsTrigger value="dashboard" className="tabs after:bg-linear-to-tr after:from-cyan-400 after:to-green-400">
+              <TabsTrigger value="tokens" className="tabs after:bg-linear-to-tr after:from-cyan-400 after:to-green-400">
                 Tokens
               </TabsTrigger>
             </Link>
@@ -45,11 +50,9 @@ function Navbar() {
           boxShadow: '0 0 4px #00FFFF, 0 0 4px #14F195',
           letterSpacing: "3px"
         }} />
-        {/* <ModeToggle/> */}
       </div>
       <div className="flex items-center gap-2 md:hidden">
-        {/* <ModeToggle /> */}
-        <MenuIcon/>
+        <MenuIcon className="text-[#29BA8B]"/>
       </div>
     </nav>
   )

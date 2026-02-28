@@ -1,19 +1,15 @@
 .logo-text {
-    font-family: 'Orbitron', sans-serif;
     font-size: 36px;
     font-weight: 900;
     background: linear-gradient(135deg, #14F195 0%, #9945FF 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    letter-spacing: 4px;
 }
 
 .tabs {
-    font-family: 'Orbitron', sans-serif;
     font-size: 17px;
     font-weight: 150;
-    letter-spacing: 3px;
     background: linear-gradient(135deg, #21e47f 0%, #00FFFF 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
