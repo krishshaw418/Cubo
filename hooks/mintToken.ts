@@ -17,7 +17,7 @@ export function useMintToken() {
         mint: publicKey(mintAddress.toBase58()),
         authority: umiInstance().identity,
         amount: mintAmount,
-        tokenOwner: publicKey(tokenOwner),
+        tokenOwner: publicKey(umiInstance().identity),
         tokenStandard: TokenStandard.Fungible
       }).sendAndConfirm(umiInstance());
 

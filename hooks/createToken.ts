@@ -18,7 +18,7 @@ export function useCreateToken() {
 
             // Creating new token mint
             const result = await createV1(umiInstance(), {
-                mint,
+                mint: mint,
                 authority: umiInstance().identity,
                 name: name,
                 symbol: symbol,
@@ -27,6 +27,8 @@ export function useCreateToken() {
                 sellerFeeBasisPoints: percentAmount(0),
                 tokenStandard: TokenStandard.Fungible
             }).sendAndConfirm(umiInstance());
+
+            console.log(result.signature);
 
             return { mintPubKey: mint.publicKey };
         } catch (error) {
