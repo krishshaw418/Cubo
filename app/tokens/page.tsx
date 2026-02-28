@@ -2,14 +2,12 @@
 import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { PublicKey, AccountInfo, ParsedAccountData } from "@solana/web3.js";
-import React, { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import Spinner from "@/components/ui/load-spinner";
 import { toast } from "sonner";
 import { calculateHeight } from "@/lib/navBarHeight";
-import { useCreateToken } from "@/hooks/createToken";
 import { Button } from "@/components/ui/button";
 import { redirect } from "next/navigation";
-import { useMintToken } from "@/hooks/mintToken";
 import { Copy } from "lucide-react";
 import {
   Dialog,
@@ -36,10 +34,8 @@ function Tokens() {
     | undefined
   >(undefined);
   const [isLoading, setIsLoading] = useState(true);
-  const { createToken } = useCreateToken();
   const spanRefs1 = useRef<(HTMLSpanElement | null)[]>([]);
   const spanRefs2 = useRef<(HTMLSpanElement | null)[]>([]);
-  const { mintTokens } = useMintToken();
 
   useEffect(() => {
     setHeight(calculateHeight());
@@ -128,19 +124,6 @@ function Tokens() {
     } catch (error) {
       console.error("Error:", error);
       toast.error("Failed to copy to clipboard!");
-    }
-  };
-
-  const handleCreate = async () => {
-    try {
-      const result = await createToken();
-      if (result) {
-        toast.success("Transaction successful!", { position: "top-left" });
-      } else {
-        toast.error("Transaction failed!");
-      }
-    } catch (error: any) {
-      toast.error(`Transaction failed: ${error.message}`);
     }
   };
 
@@ -246,23 +229,23 @@ function Tokens() {
                     ref={(el) => {
                       spanRefs1.current[id] = el;
                     }}
-                    onClick={async (
-                      e: React.MouseEvent<HTMLSpanElement, MouseEvent>,
-                    ) => {
-                      const mintAddress = new PublicKey(
-                        e.currentTarget.textContent,
-                      );
-                      if (mintAddress) {
-                        alert(`Mint Address: ${e.currentTarget.textContent}`);
-                        const signature = await mintTokens(mintAddress, 100);
-                        // console.log(signature);
-                        if (signature) {
-                          toast.success("100 tokens minted sucessfully!");
-                        } else {
-                          toast.error("Something went wrong!");
-                        }
-                      }
-                    }}
+                    // onClick={async (
+                    //   e: React.MouseEvent<HTMLSpanElement, MouseEvent>,
+                    // ) => {
+                    //   const mintAddress = new PublicKey(
+                    //     e.currentTarget.textContent,
+                    //   );
+                    //   if (mintAddress) {
+                    //     alert(`Mint Address: ${e.currentTarget.textContent}`);
+                    //     const signature = await mintTokens(mintAddress, 100);
+                    //     // console.log(signature);
+                    //     if (signature) {
+                    //       toast.success("100 tokens minted sucessfully!");
+                    //     } else {
+                    //       toast.error("Something went wrong!");
+                    //     }
+                    //   }
+                    // }}
                   >
                     {`${JSON.stringify(tokenAccount.account.data.parsed.info.mint).replace(/^(['"])(.*)\1$/, "$2")}`}
                   </span>
