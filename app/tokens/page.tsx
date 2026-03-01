@@ -20,19 +20,14 @@ import {
 } from "@/components/ui/dialog";
 import TokenMetadataForm from "@/components/ui/tokenform.tsx/TokenCreateForm";
 import "./page.css";
+import TokenCard from "@/components/ui/token-list/token-card";
 
 function Tokens() {
   const { connection } = useConnection();
   const wallet = useWallet();
   const isConnected = useWallet().connected;
   const [height, setHeight] = useState(0);
-  const [tokenAccounts, setTokenAccounts] = useState<
-    | {
-        pubkey: PublicKey;
-        account: AccountInfo<ParsedAccountData>;
-      }[]
-    | undefined
-  >(undefined);
+  const [tokenAccounts, setTokenAccounts] = useState<{ pubkey: PublicKey; account: AccountInfo<ParsedAccountData> }[] | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(true);
   const spanRefs1 = useRef<(HTMLSpanElement | null)[]>([]);
   const spanRefs2 = useRef<(HTMLSpanElement | null)[]>([]);
@@ -59,6 +54,7 @@ function Tokens() {
           setIsLoading(true);
         }
 
+        console.log(tokenAcc.value);
         setTokenAccounts(tokenAcc.value);
       } catch (error: any) {
         toast.error(`Error: ${error}`);
@@ -142,7 +138,7 @@ function Tokens() {
             <Button
               type="button"
               variant="ghost"
-              className="w-50 button"
+              className="w-50 button hover:cursor-pointer"
               style={{
                 width: "215px",
               }}
@@ -186,83 +182,33 @@ function Tokens() {
         </Dialog>
       </div>
 
-      {/* Div for the table */}
-      <div className="px-5 text-cyan-300 text-shadow-lg filter drop-shadow-lg drop-shadow-green-500/50 border border-cyan-300 shadow-[0_0_15px_rgba(59,130,246,0.5)]">
-        {/* Div for column names */}
-        <div className="grid grid-cols-3 py-5">
-          <div className="flex justify-center border border-purple-500 shadow-[0_0_15px_rgba(59,130,246,0.5)] p-2">
-            <span>Token Account</span>
-          </div>
-          <div className="flex justify-center border border-purple-500 shadow-[0_0_15px_rgba(59,130,246,0.5)] p-2">
-            <span>Mint Address</span>
-          </div>
-          <div className="flex justify-center border border-purple-500 shadow-[0_0_15px_rgba(59,130,246,0.5)] p-2">
-            <span>Amount</span>
-          </div>
+      <div className="flex flex-col gap-5 mx-20 mb-5">
+        <div className="grid grid-cols-6 pl-8 pr-5 bg-linear-to-r from-[#14F195] to-[#00FFFF] bg-clip-text text-transparent">
+          <span className="col-span-2">
+            {"ASSET"}
+          </span>
+          <span className="flex justify-end">
+            {"BALANCE"}
+          </span>
+          <span className="flex justify-end">
+            {"PRICE"}
+          </span>
+          <span className="flex justify-end">
+            {"VALUE"}
+          </span>
+          <span className="flex justify-end">
+            {"24H"}
+          </span>
         </div>
-
         {isLoading && <Spinner />}
-
-        {tokenAccounts?.length !== 0 &&
+        <div className="flex flex-col gap-5 mb-5 bg-linear-to-tr from-[#14F195] to-[#00FFFF] bg-clip-text text-transparent">
+          {tokenAccounts?.length !== 0 &&
           tokenAccounts?.map((tokenAccount, id) => {
             return (
-              <div className="grid grid-cols-3 py-5" key={id}>
-                {/* Div for token account address */}
-                <div className="flex gap-2 border border-purple-500 shadow-[0_0_15px_rgba(59,130,246,0.5)] px-5 py-2">
-                  <span
-                    className="truncate w-50 md:w-full"
-                    ref={(el) => {
-                      spanRefs2.current[id] = el;
-                    }}
-                  >
-                    {`${tokenAccount.pubkey}`}
-                  </span>
-                  <span>
-                    <Copy onClick={() => handleCopy2(id)} />
-                  </span>
-                </div>
-
-                {/* Div for mint account address */}
-                <div className="flex gap-2 border border-purple-500 shadow-[0_0_15px_rgba(59,130,246,0.5)] px-5 py-2">
-                  <span
-                    className="truncate w-50 md:w-full"
-                    ref={(el) => {
-                      spanRefs1.current[id] = el;
-                    }}
-                    // onClick={async (
-                    //   e: React.MouseEvent<HTMLSpanElement, MouseEvent>,
-                    // ) => {
-                    //   const mintAddress = new PublicKey(
-                    //     e.currentTarget.textContent,
-                    //   );
-                    //   if (mintAddress) {
-                    //     alert(`Mint Address: ${e.currentTarget.textContent}`);
-                    //     const signature = await mintTokens(mintAddress, 100);
-                    //     // console.log(signature);
-                    //     if (signature) {
-                    //       toast.success("100 tokens minted sucessfully!");
-                    //     } else {
-                    //       toast.error("Something went wrong!");
-                    //     }
-                    //   }
-                    // }}
-                  >
-                    {`${JSON.stringify(tokenAccount.account.data.parsed.info.mint).replace(/^(['"])(.*)\1$/, "$2")}`}
-                  </span>
-                  <span>
-                    <Copy onClick={() => handleCopy1(id)} />
-                  </span>
-                </div>
-
-                {/* Div for amount of tokens in the ata */}
-                <div className="flex border border-purple-500 shadow-[0_0_15px_rgba(59,130,246,0.5)] p-2 justify-center">
-                  <span>
-                    {`${JSON.stringify(tokenAccount.account.data.parsed.info.tokenAmount.uiAmount)}`}
-                  </span>
-                </div>
-              </div>
+              <TokenCard mintAddress={new PublicKey(tokenAccount.account.data.parsed.info.mint)} key={id}/>
             );
           })}
+        </div>
       </div>
     </div>
   );

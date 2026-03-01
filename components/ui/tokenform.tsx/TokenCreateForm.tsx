@@ -125,7 +125,8 @@ function TokenMetadataForm(props: { id: string }) {
                     return;
                 }
 
-                console.log(data.symbol);
+                toast.success("Image uploaded successfully!");
+
                 // Preparing metadata json
                 const metadata = {
                     name: data.name,
@@ -142,6 +143,8 @@ function TokenMetadataForm(props: { id: string }) {
                     return;
                 }
 
+                toast.success("Metadata uploaded successfully!");
+
                 // initializing mint account and metadata account
                 const result = await createToken(data.name, metaDataJsonURI, data.symbol, data.decimals);
 
@@ -150,8 +153,7 @@ function TokenMetadataForm(props: { id: string }) {
                     return;
                 }
 
-                console.log(data.supply);
-
+                toast.success("Mint account initialized successfully!");
                 // minting tokens
                 const mintSignature = await mintTokens(
                     new PublicKey(result.mintPubKey), // mint address
@@ -163,7 +165,7 @@ function TokenMetadataForm(props: { id: string }) {
                     return;
                 }
 
-                toast.success("Successfully created and minted new tokens!");
+                toast.success("Tokens minted successfully!");
 
             } catch (error: any) {
                 console.error(error);

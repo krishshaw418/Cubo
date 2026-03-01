@@ -29,12 +29,12 @@ function Navbar() {
         }}>
           <TabsList variant="line">
             <Link href="/">
-              <TabsTrigger value="home" className="tabs after:bg-linear-to-tr after:from-cyan-400 after:to-green-400">
+              <TabsTrigger value="home" className="tabs after:bg-linear-to-tr after:from-cyan-400 after:to-green-400 hover:cursor-pointer">
                 Home
               </TabsTrigger>
             </Link>
             <Link href="/tokens">
-              <TabsTrigger value="tokens" className="tabs after:bg-linear-to-tr after:from-cyan-400 after:to-green-400">
+              <TabsTrigger value="tokens" className="tabs after:bg-linear-to-tr after:from-cyan-400 after:to-green-400 hover:cursor-pointer">
                 Tokens
               </TabsTrigger>
             </Link>
