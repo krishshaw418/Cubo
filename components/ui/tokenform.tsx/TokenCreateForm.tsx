@@ -155,7 +155,6 @@ function TokenMetadataForm(props: { id: string }) {
                 // minting tokens
                 const mintSignature = await mintTokens(
                     new PublicKey(result.mintPubKey), // mint address
-                    publicKey, // token owner address (dApp user)
                     data.supply, // initial supply of the new token
                 );
 

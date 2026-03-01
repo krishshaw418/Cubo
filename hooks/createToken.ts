@@ -12,23 +12,22 @@ export function useCreateToken() {
     const { umiInstance } = useUmi();
 
     const createToken = async (name: string, uri: string, symbol: string, decimal: number) => {
+        const umi = umiInstance();
         try {
             // Creating a mint account
-            const mint = generateSigner(umiInstance());
+            const mint = generateSigner(umi);
 
             // Creating new token mint
-            const result = await createV1(umiInstance(), {
+            const result = await createV1(umi, {
                 mint: mint,
-                authority: umiInstance().identity,
+                authority: umi.identity,
                 name: name,
                 symbol: symbol,
                 decimals: decimal,
                 uri: uri,
                 sellerFeeBasisPoints: percentAmount(0),
                 tokenStandard: TokenStandard.Fungible
-            }).sendAndConfirm(umiInstance());
-
-            console.log(result.signature);
+            }).sendAndConfirm(umi);
 
             return { mintPubKey: mint.publicKey };
         } catch (error) {

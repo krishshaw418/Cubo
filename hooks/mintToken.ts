@@ -6,20 +6,18 @@ import { publicKey } from "@metaplex-foundation/umi";
 export function useMintToken() {
 
   const { umiInstance } = useUmi();
+  const umi = umiInstance();
 
-  const mintTokens = async (mintAddress: PublicKey, tokenOwner: PublicKey, mintAmount: number) => {
+  const mintTokens = async (mintAddress: PublicKey, mintAmount: number) => {
     try {
-      if (!tokenOwner) {
-        throw new Error("Token owner public key not found!");
-      }
       
-      const result = await mintV1(umiInstance(), {
+      const result = await mintV1(umi, {
         mint: publicKey(mintAddress.toBase58()),
-        authority: umiInstance().identity,
+        authority: umi.identity,
         amount: mintAmount,
-        tokenOwner: publicKey(umiInstance().identity),
+        tokenOwner: umi.identity.publicKey,
         tokenStandard: TokenStandard.Fungible
-      }).sendAndConfirm(umiInstance());
+      }).sendAndConfirm(umi);
 
       return result.signature;
     } catch (error) {
