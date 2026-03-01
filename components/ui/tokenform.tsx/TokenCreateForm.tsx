@@ -168,7 +168,7 @@ function TokenMetadataForm(props: { id: string }) {
 
             } catch (error: any) {
                 console.error(error);
-                toast.error(error);
+                toast.error(error.message);
                 return;
             }
         }
