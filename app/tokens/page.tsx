@@ -2,13 +2,11 @@
 import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { PublicKey, AccountInfo, ParsedAccountData } from "@solana/web3.js";
-import { useEffect, useState, useRef } from "react";
-import Spinner from "@/components/ui/load-spinner";
+import { useEffect, useState, useRef, lazy, Suspense } from "react";
 import { toast } from "sonner";
 import { calculateHeight } from "@/lib/navBarHeight";
 import { Button } from "@/components/ui/button";
 import { redirect } from "next/navigation";
-import { Copy } from "lucide-react";
 import {
   Dialog,
   DialogTrigger,
@@ -20,7 +18,8 @@ import {
 } from "@/components/ui/dialog";
 import TokenMetadataForm from "@/components/ui/tokenform.tsx/TokenCreateForm";
 import "./page.css";
-import TokenCard from "@/components/ui/token-list/token-card";
+const TokenCard = lazy(() => import("@/components/ui/token-list/token-card"));
+import { Skeleton } from "@/components/ui/skeleton";
 
 function Tokens() {
   const { connection } = useConnection();
@@ -200,12 +199,17 @@ function Tokens() {
             {"24H"}
           </span>
         </div>
-        {isLoading && <Spinner />}
-        <div className="flex flex-col gap-5 mb-5 bg-linear-to-tr from-[#14F195] to-[#00FFFF] bg-clip-text text-transparent">
+        <div className="flex flex-col gap-5 mb-5">
           {tokenAccounts?.length !== 0 &&
           tokenAccounts?.map((tokenAccount, id) => {
             return (
-              <TokenCard mintAddress={new PublicKey(tokenAccount.account.data.parsed.info.mint)} key={id}/>
+              <div key={id} style={{
+                animationDelay: `${id * 100}ms`
+              }} className="item bg-linear-to-tr from-[#14F195] to-[#00FFFF] bg-clip-text text-transparent">
+                <Suspense fallback={<Skeleton className="w-full h-20 bg-gray-800"/>}>
+                  <TokenCard mintAddress={new PublicKey(tokenAccount.account.data.parsed.info.mint)}/>
+                </Suspense>
+              </div>
             );
           })}
         </div>

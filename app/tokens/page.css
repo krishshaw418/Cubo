@@ -16,3 +16,17 @@
     box-shadow: 0 0 7px #00FFFF, 0 0 7px #14F195;
     letter-spacing: "3px"
 }
+
+.item {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeUp 0.4s ease forwards;
+  animation-delay: calc(var(--i) * 100ms); /* stagger = index × delay */
+}
+
+@keyframes fadeUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
