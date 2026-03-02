@@ -1,14 +1,11 @@
 "use client"
 import "./page.css";
 import { calculateHeight } from "@/lib/navBarHeight";
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
+
 function Page() {
-
-  const [height, setHeight] = useState(0);
-
-  useEffect(() => {
-    setHeight(calculateHeight());
-  }, []);
+  
+  const height = useMemo(() => calculateHeight(), []);
 
   return (
     <section aria-label="hero" className="flex gap-5 w-full md:w-screen items-center justify-center lg:justify-between p-5 md:p-20 md:my-7 lg:p-30 lg:my-10 overflow-hidden"

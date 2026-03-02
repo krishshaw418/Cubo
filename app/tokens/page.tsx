@@ -2,7 +2,7 @@
 import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { PublicKey, AccountInfo, ParsedAccountData } from "@solana/web3.js";
-import { useEffect, useState, useRef, lazy, Suspense } from "react";
+import { useEffect, useState, lazy, Suspense, useMemo } from "react";
 import { toast } from "sonner";
 import { calculateHeight } from "@/lib/navBarHeight";
 import { Button } from "@/components/ui/button";
@@ -25,21 +25,15 @@ function Tokens() {
   const { connection } = useConnection();
   const wallet = useWallet();
   const isConnected = useWallet().connected;
-  const [height, setHeight] = useState(0);
+  const height = useMemo(() => calculateHeight(), []);
   const [tokenAccounts, setTokenAccounts] = useState<{ pubkey: PublicKey; account: AccountInfo<ParsedAccountData> }[] | undefined>(undefined);
-  const [isLoading, setIsLoading] = useState(true);
-  const spanRefs1 = useRef<(HTMLSpanElement | null)[]>([]);
-  const spanRefs2 = useRef<(HTMLSpanElement | null)[]>([]);
-
-  useEffect(() => {
-    setHeight(calculateHeight());
-  }, []);
 
   const pubKey = wallet.publicKey;
   useEffect(() => {
     const fetchTokenAccounts = async () => {
       try {
         if (!pubKey) {
+          toast.error("Public key not found!");
           return;
         }
         const tokenAcc = await connection.getParsedTokenAccountsByOwner(
@@ -49,22 +43,15 @@ function Tokens() {
           },
         );
 
-        if (!tokenAccounts) {
-          setIsLoading(true);
-        }
-
-        console.log(tokenAcc.value);
         setTokenAccounts(tokenAcc.value);
       } catch (error: any) {
         toast.error(`Error: ${error}`);
         console.error(error);
-      } finally {
-        setIsLoading(false);
       }
     };
 
     fetchTokenAccounts();
-  }, [isConnected]);
+  }, [isConnected, pubKey, connection]);
 
   useEffect(() => {
     if (!isConnected) {
@@ -89,38 +76,6 @@ function Tokens() {
       </div>
     );
   }
-
-  const handleCopy1 = async (id: number) => {
-    try {
-      if (spanRefs1.current) {
-        const publicKey = spanRefs1.current[id]?.textContent;
-        console.log(publicKey);
-        if (publicKey) {
-          await navigator.clipboard.writeText(publicKey);
-          toast.success("Copied to clipboard!");
-        }
-      }
-    } catch (error) {
-      console.error("Error:", error);
-      toast.error("Failed to copy to clipboard!");
-    }
-  };
-
-  const handleCopy2 = async (id: number) => {
-    try {
-      if (spanRefs1.current) {
-        const publicKey = spanRefs2.current[id]?.textContent;
-        console.log(publicKey);
-        if (publicKey) {
-          await navigator.clipboard.writeText(publicKey);
-          toast.success("Copied to clipboard!");
-        }
-      }
-    } catch (error) {
-      console.error("Error:", error);
-      toast.error("Failed to copy to clipboard!");
-    }
-  };
 
   return (
     <div

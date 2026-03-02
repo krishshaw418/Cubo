@@ -1,6 +1,6 @@
 "use client"
 export function calculateHeight() {
-    const navBar = document.getElementById("navbar");
+    const navBar = window.document.getElementById("navbar");
     if (navBar) {
         return navBar.offsetHeight;
     }

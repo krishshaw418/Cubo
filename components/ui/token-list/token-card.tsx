@@ -13,28 +13,33 @@ function TokenCard(props: { mintAddress: PublicKey }) {
             image: string,
             description: string
     } | undefined>(undefined);
-    const [balance, setBalance] = useState<bigint | undefined>(undefined);
+    const [balance, setBalance] = useState<number | undefined>(undefined);
     
     const fetchTokenMetaData = async (mintAddress: PublicKey) => {
         const umiPublicKey = publicKey(mintAddress.toBase58());
-        console.log(umiPublicKey);
         const umi = umiInstance();
-        const result = await fetchDigitalAssetWithAssociatedToken(umi, umiPublicKey, umi.identity.publicKey);
-        console.log(result);
+        try {
+            const result = await fetchDigitalAssetWithAssociatedToken(umi, umiPublicKey, umi.identity.publicKey);
+            const tokenBalance = result.token.amount;
+            setBalance(() => Number(tokenBalance) / Math.pow(10, result.mint.decimals));
 
-        const tokenBalance = result.token.amount;
-        setBalance(tokenBalance);
-        const metadata = await fetch(result.metadata.uri);
-        const data: {
-            name: string,
-            symbol: string,
-            image: string,
-            description: string
-        } = await metadata.json();
+            // Fetching the metadata from the metadata uri
+            const metadata = await fetch(result.metadata.uri);
 
-        console.log(data);
-        if (data) {
-            setData(data);
+            // deserializing the data
+            const data: {
+                name: string,
+                symbol: string,
+                image: string,
+                description: string
+            } = await metadata.json();
+
+            if (data) {
+                setData(data);
+            }
+        } catch (error: any) {
+            console.error(error);
+            return;
         }
     }
 

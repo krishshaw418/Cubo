@@ -286,7 +286,7 @@ function TokenMetadataForm(props: { id: string }) {
                         <Controller
                             name="image"
                             control={form.control}
-                            render={({ field, fieldState }) => (
+                            render={({ fieldState }) => (
                                 <Field data-invalid={fieldState.invalid}>
                                     <FieldLabel htmlFor="token-image" className="label">
                                         Image URL
@@ -299,7 +299,7 @@ function TokenMetadataForm(props: { id: string }) {
                                         {/* getInputProps handles type, accept, onChange internally */}
                                         <Input {...getInputProps()} id="token-image" />
                                         <p className="text-sm text-[#606060]">
-                                            Drag 'n' drop token image here, or click to select files.
+                                            Drag &apos;n&apos; drop token image here, or click to select files.
                                             Required types are .png, .jpg, .gif
                                         </p>
                                     </div>

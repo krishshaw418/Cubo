@@ -18,7 +18,7 @@ export function useCreateToken() {
             const mint = generateSigner(umi);
 
             // Creating new token mint
-            const result = await createV1(umi, {
+            await createV1(umi, {
                 mint: mint,
                 authority: umi.identity,
                 name: name,
