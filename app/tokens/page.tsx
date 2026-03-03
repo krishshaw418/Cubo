@@ -2,9 +2,9 @@
 import { TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { PublicKey, AccountInfo, ParsedAccountData } from "@solana/web3.js";
-import { useEffect, useState, lazy, Suspense, useMemo } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
 import { toast } from "sonner";
-import { calculateHeight } from "@/lib/navBarHeight";
+import { useNavBarHeight } from "@/hooks/navBarHeight";
 import { Button } from "@/components/ui/button";
 import { redirect } from "next/navigation";
 import {
@@ -25,8 +25,11 @@ function Tokens() {
   const { connection } = useConnection();
   const wallet = useWallet();
   const isConnected = useWallet().connected;
-  const height = useMemo(() => calculateHeight(), []);
-  const [tokenAccounts, setTokenAccounts] = useState<{ pubkey: PublicKey; account: AccountInfo<ParsedAccountData> }[] | undefined>(undefined);
+  const height = useNavBarHeight();
+  const [tokenAccounts, setTokenAccounts] = useState<
+    { pubkey: PublicKey; account: AccountInfo<ParsedAccountData> }[] | undefined
+    >(undefined);
+  const [isLaunching, setIsLaunching] = useState(false);
 
   const pubKey = wallet.publicKey;
   useEffect(() => {
@@ -117,20 +120,22 @@ function Tokens() {
 
             {/* Token form component */}
             <div className="no-scrollbar -mx-4 max-h-[67vh] overflow-y-auto px-4">
-              <TokenMetadataForm id="token-metadata-form" />
+              <TokenMetadataForm id="token-metadata-form" isLaunching={isLaunching} setIsLaunching={setIsLaunching}/>
             </div>
 
             <DialogDescription className="sr-only"></DialogDescription>
 
             <DialogFooter>
-              <Button
-                type="submit"
-                variant="ghost"
-                form="token-metadata-form"
-                className="button"
-              >
-                Launch
-              </Button>
+              {!isLaunching && (
+                <Button
+                  type="submit"
+                  variant="ghost"
+                  form="token-metadata-form"
+                  className="button"
+                >
+                  Launch
+                </Button>
+              )}
             </DialogFooter>
           </DialogContent>
         </Dialog>
@@ -138,35 +143,37 @@ function Tokens() {
 
       <div className="flex flex-col gap-5 mx-20 mb-5">
         <div className="grid grid-cols-6 pl-8 pr-5 bg-linear-to-r from-[#14F195] to-[#00FFFF] bg-clip-text text-transparent">
-          <span className="col-span-2">
-            {"ASSET"}
-          </span>
-          <span className="flex justify-end">
-            {"BALANCE"}
-          </span>
-          <span className="flex justify-end">
-            {"PRICE"}
-          </span>
-          <span className="flex justify-end">
-            {"VALUE"}
-          </span>
-          <span className="flex justify-end">
-            {"24H"}
-          </span>
+          <span className="col-span-2">{"ASSET"}</span>
+          <span className="flex justify-end">{"BALANCE"}</span>
+          <span className="flex justify-end">{"PRICE"}</span>
+          <span className="flex justify-end">{"VALUE"}</span>
+          <span className="flex justify-end">{"24H"}</span>
         </div>
         <div className="flex flex-col gap-5 mb-5">
           {tokenAccounts?.length !== 0 &&
-          tokenAccounts?.map((tokenAccount, id) => {
-            return (
-              <div key={id} style={{
-                animationDelay: `${id * 100}ms`
-              }} className="item bg-linear-to-tr from-[#14F195] to-[#00FFFF] bg-clip-text text-transparent">
-                <Suspense fallback={<Skeleton className="w-full h-20 bg-gray-800"/>}>
-                  <TokenCard mintAddress={new PublicKey(tokenAccount.account.data.parsed.info.mint)}/>
-                </Suspense>
-              </div>
-            );
-          })}
+            tokenAccounts?.map((tokenAccount, id) => {
+              return (
+                <div
+                  key={id}
+                  style={{
+                    animationDelay: `${id * 100}ms`,
+                  }}
+                  className="item bg-linear-to-tr from-[#14F195] to-[#00FFFF] bg-clip-text text-transparent"
+                >
+                  <Suspense
+                    fallback={<Skeleton className="w-full h-20 bg-gray-800" />}
+                  >
+                    <TokenCard
+                      mintAddress={
+                        new PublicKey(
+                          tokenAccount.account.data.parsed.info.mint,
+                        )
+                      }
+                    />
+                  </Suspense>
+                </div>
+              );
+            })}
         </div>
       </div>
     </div>

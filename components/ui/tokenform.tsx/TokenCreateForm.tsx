@@ -26,15 +26,15 @@ import { useCreateToken } from "@/hooks/createToken";
 import { useMintToken } from "@/hooks/mintToken";
 import { PublicKey } from "@solana/web3.js";
 import { useWallet } from "@solana/wallet-adapter-react";
+import { useEffect, useState } from "react";
+import { Progress } from "../progress";
 
 // image file type validation
 const imageSchema = z
   .instanceof(File)
   .refine(
-    (file) => (
-      ["image/png", "image/jpg", "image/gif"].includes(file.type),
-      { message: "Invalid image type" }
-    ),
+    (file) => ["image/png", "image/jpeg", "image/gif"].includes(file.type),
+    { message: "Invalid image type" }
   )
   .nullable();
 
@@ -63,7 +63,7 @@ const formSchema = z.object({
   image: imageSchema,
 });
 
-function TokenMetadataForm(props: { id: string }) {
+function TokenMetadataForm(props: { id: string, isLaunching: boolean, setIsLaunching: React.Dispatch<React.SetStateAction<boolean>> }) {
     // react-dropzone for image
     const { acceptedFiles, getInputProps, getRootProps } = useDropzone({
         maxFiles: 1, // number of files allowed
@@ -94,8 +94,13 @@ function TokenMetadataForm(props: { id: string }) {
     const { createToken } = useCreateToken();
     const { mintTokens } = useMintToken();
     const { publicKey } = useWallet();
+    const [progress, setProgress] = useState(0);
+    // const [isLaunching, setIsLaunching] = useState(false);
   
     async function onSubmit(data: z.infer<typeof formSchema>) {
+
+        props.setIsLaunching((prev) => !prev);
+
         if (!publicKey) {
             toast.error("Wallet not connected!");
             return;
@@ -119,12 +124,13 @@ function TokenMetadataForm(props: { id: string }) {
             try {
                 // Image file upload to ipfs
                 const [imgURI] = await umi.uploader.upload([image]);
+                console.log(imgURI);
             
                 if (!imgURI) {
-                    toast.error("Failed to upload token image!");
-                    return;
+                    throw new Error("Failed to upload token image");
                 }
 
+                setProgress(25);
                 toast.success("Image uploaded successfully!");
 
                 // Preparing metadata json
@@ -139,20 +145,20 @@ function TokenMetadataForm(props: { id: string }) {
                 const metaDataJsonURI = await umi.uploader.uploadJson(metadata);
 
                 if (!metaDataJsonURI) {
-                    toast.error("Failed to upload metadata JSON!");
-                    return;
+                    throw new Error("Failed to upload metadata!");
                 }
 
+                setProgress(50);
                 toast.success("Metadata uploaded successfully!");
 
                 // initializing mint account and metadata account
                 const result = await createToken(data.name, metaDataJsonURI, data.symbol, data.decimals);
 
                 if (!result) {
-                    toast.error("Failed to create token mint!");
-                    return;
+                    throw new Error("Failed to initialize mint and metadata account!");
                 }
 
+                setProgress(75);
                 toast.success("Mint account initialized successfully!");
                 // minting tokens
                 const mintSignature = await mintTokens(
@@ -161,24 +167,48 @@ function TokenMetadataForm(props: { id: string }) {
                 );
 
                 if (!mintSignature) {
-                    toast.error("Failed to mint new tokens!");
-                    return;
+                    throw new Error("Failed to mint new tokens!");
                 }
 
+                setProgress(100);
                 toast.success("Tokens minted successfully!");
 
             } catch (error: any) {
-                console.error(error);
                 toast.error(error.message);
-                return;
+                props.setIsLaunching(false);
+                setProgress(0);
             }
         }
     }
-    
+
+    useEffect(() => {
+        console.log("From useEffect: ", props.isLaunching);
+        if (progress === 100) {
+            props.setIsLaunching(false);
+            setProgress(0);
+        }
+    }, [progress]);
+
+    const label = new Map([
+        [0, "Uploading image..."],
+        [25, "Uploading metadata..."],
+        [50, "Initializing mint..."],
+        [75, "Minting new tokens..."]
+    ])
+
     return (
         <Card className="border-0 bg-transparent text-white">
             <CardContent>
-                <form id={props.id} onSubmit={form.handleSubmit(onSubmit)}>
+                {props.isLaunching && (
+                    <div>
+                        <Field>
+                            <FieldLabel className="label">{label.get(progress)}</FieldLabel>
+                            <Progress value={progress} className="w-[50%] mb-4 bg-gray-800" />
+                        </Field>
+                    </div>
+                )}
+                {!props.isLaunching && (
+                    <form id={props.id} onSubmit={form.handleSubmit(onSubmit)}>
                     <FieldGroup>
                         <Controller
                             name="name"
@@ -351,6 +381,7 @@ function TokenMetadataForm(props: { id: string }) {
                         />
                     </FieldGroup>
                 </form>
+                )}
             </CardContent>
         </Card>
     );
