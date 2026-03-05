@@ -9,10 +9,9 @@ import {
 import useUmi from "@/hooks/useUmi";
 
 export function useCreateToken() {
-    const { umiInstance } = useUmi();
+    const { umi } = useUmi();
 
     const createToken = async (name: string, uri: string, symbol: string, decimal: number) => {
-        const umi = umiInstance();
         try {
             // Creating a mint account
             const mint = generateSigner(umi);

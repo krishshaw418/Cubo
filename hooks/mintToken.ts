@@ -5,12 +5,13 @@ import { publicKey } from "@metaplex-foundation/umi";
 
 export function useMintToken() {
 
-  const { umiInstance } = useUmi();
-  const umi = umiInstance();
+  const { umi } = useUmi();
 
   const mintTokens = async (mintAddress: PublicKey, mintAmount: number) => {
+
+    console.log("UMI identity:", umi.identity.publicKey.toString());
+
     try {
-      
       const result = await mintV1(umi, {
         mint: publicKey(mintAddress.toBase58()),
         authority: umi.identity,

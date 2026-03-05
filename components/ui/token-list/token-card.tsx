@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 
 function TokenCard(props: { mintAddress: PublicKey }) {
 
-    const { umiInstance } = useUmi();
+    const { umi } = useUmi();
     const [data, setData] = useState<{
             name: string,
             symbol: string,
@@ -17,7 +17,6 @@ function TokenCard(props: { mintAddress: PublicKey }) {
     
     const fetchTokenMetaData = async (mintAddress: PublicKey) => {
         const umiPublicKey = publicKey(mintAddress.toBase58());
-        const umi = umiInstance();
         try {
             const result = await fetchDigitalAssetWithAssociatedToken(umi, umiPublicKey, umi.identity.publicKey);
             const tokenBalance = result.token.amount;

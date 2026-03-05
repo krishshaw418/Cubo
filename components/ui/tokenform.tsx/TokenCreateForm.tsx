@@ -90,7 +90,7 @@ function TokenMetadataForm(props: { id: string, isLaunching: boolean, setIsLaunc
     });
 
     // hook calls
-    const { umiInstance } = useUmi();
+    const { umi } = useUmi();
     const { createToken } = useCreateToken();
     const { mintTokens } = useMintToken();
     const { publicKey } = useWallet();
@@ -105,8 +105,6 @@ function TokenMetadataForm(props: { id: string, isLaunching: boolean, setIsLaunc
             toast.error("Wallet not connected!");
             return;
         }
-
-        const umi = umiInstance();
 
         let image = null;
         // transforming image file object into buffer
