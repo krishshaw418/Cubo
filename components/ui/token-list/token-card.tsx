@@ -2,7 +2,7 @@ import { fetchDigitalAssetWithAssociatedToken } from "@metaplex-foundation/mpl-t
 import useUmi from "@/hooks/useUmi";
 import { PublicKey } from "@solana/web3.js";
 import { publicKey } from "@metaplex-foundation/umi";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 function TokenCard(props: { mintAddress: PublicKey }) {
 
@@ -14,7 +14,10 @@ function TokenCard(props: { mintAddress: PublicKey }) {
             description: string
     } | undefined>(undefined);
     const [balance, setBalance] = useState<number | undefined>(undefined);
-    
+    const [price, setPrice] = useState(Number((Math.random() * 1000).toFixed(2)));
+    const [value, setValue] = useState(Number((Math.random() * 1000).toFixed(2)));
+    const [volume, setVolume] = useState(Number(Math.floor((Math.random() * 1000000000))));
+
     const fetchTokenMetaData = async (mintAddress: PublicKey) => {
         const umiPublicKey = publicKey(mintAddress.toBase58());
         try {
@@ -46,32 +49,46 @@ function TokenCard(props: { mintAddress: PublicKey }) {
         fetchTokenMetaData(props.mintAddress);
     }, []);
 
+    useEffect(() => {
+        setInterval(() => {
+            let val = Math.random() * 1000;
+            val = Number(val.toFixed(2));
+            setValue(val);
+            let pri = Math.random() * 1000;
+            pri = Number(pri.toFixed(2));
+            setPrice(pri);
+            let vol = Math.random() * 1000000000;
+            vol = Math.floor(vol);
+            setVolume(vol);
+        }, 10000); 
+    }, []);
+
   return (
     <div className="rounded-2xl">
         { data && (
-            <div className="grid grid-cols-6 items-center justify-between p-5 bg-transparent rounded-2xl border-l-8 border-l-emerald-300 border border-emerald-300 shadow-[0_0_15px_rgba(59,130,246,0.5)]">
-                <span className="flex items-center gap-5 col-span-2">
-                    <img src={data.image} alt="token-img" className="rounded-full h-15 w-15 object-cover border shadow-[0_0_15px_rgba(59,130,246,0.5)]"/>
-                    <span className="flex flex-col">
+            <div className="grid grid-cols-5 items-center justify-between p-3 bg-transparent rounded-2xl border-l-8 border-l-emerald-300 border border-emerald-300 shadow-[0_0_15px_rgba(59,130,246,0.5)]">
+                <span className="flex justify-start items-center gap-5">
+                    <img src={data.image} alt="token-img" className="rounded-full h-14 w-14 object-cover border shadow-[0_0_15px_rgba(59,130,246,0.5)]"/>
+                    <div className="flex flex-col">
                         <h1 className="font-extrabold text-lg">
                             {data.name}
                         </h1>
                         <h2 className="text-gray-300 font-extralight text-xs">
                             {data.symbol}
                         </h2>
-                    </span>
+                    </div>
                 </span>
                 <span className="flex justify-end">
                     {balance}
                 </span>
                 <span className="flex justify-end">
-                    -
+                    {"$"}{price}
                 </span>
                 <span className="flex justify-end">
-                    -
+                    {"$"}{value}
                 </span>
                 <span className="flex justify-end">
-                    -
+                    {"$"}{volume}
                 </span>
             </div>
         ) }

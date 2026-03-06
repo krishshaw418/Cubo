@@ -1,6 +1,8 @@
 @import "tailwindcss";
 @import "tw-animate-css";
-@plugin 'tailwind-scrollbar';
+@plugin 'tailwind-scrollbar' {
+    nocompatible: true;
+}
 
 @custom-variant dark (&:is(.dark *));
 
@@ -142,3 +144,7 @@ input[type="number"]::-webkit-outer-spin-button {
   font-family: 'Orbitron', sans-serif;
   letter-spacing: 3px;
 }
+
+/* .div::-webkit-scrollbar {
+  display: none;
+} */

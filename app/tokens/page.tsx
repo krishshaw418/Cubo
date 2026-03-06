@@ -5,21 +5,14 @@ import { PublicKey, AccountInfo, ParsedAccountData } from "@solana/web3.js";
 import { useEffect, useState, lazy, Suspense } from "react";
 import { toast } from "sonner";
 import { useNavBarHeight } from "@/hooks/navBarHeight";
-import { Button } from "@/components/ui/button";
 import { redirect } from "next/navigation";
-import {
-  Dialog,
-  DialogTrigger,
-  DialogDescription,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import TokenMetadataForm from "@/components/ui/tokenform.tsx/TokenCreateForm";
 import "./page.css";
 const TokenCard = lazy(() => import("@/components/ui/token-list/token-card"));
 import { Skeleton } from "@/components/ui/skeleton";
+import { Separator } from "@/components/ui/separator";
+import TokenDialog from "@/components/ui/tokenform.tsx/TokenDialog";
+import TableHeader from "@/components/ui/tokenform.tsx/TableHeader";
+import TableFooter from "@/components/ui/tokenform.tsx/TableFooter";
 
 function Tokens() {
   const { connection } = useConnection();
@@ -29,14 +22,12 @@ function Tokens() {
   const [tokenAccounts, setTokenAccounts] = useState<
     { pubkey: PublicKey; account: AccountInfo<ParsedAccountData> }[] | undefined
     >(undefined);
-  const [isLaunching, setIsLaunching] = useState(false);
 
   const pubKey = wallet.publicKey;
   useEffect(() => {
     const fetchTokenAccounts = async () => {
       try {
         if (!pubKey) {
-          toast.error("Public key not found!");
           return;
         }
         const tokenAcc = await connection.getParsedTokenAccountsByOwner(
@@ -75,109 +66,73 @@ function Tokens() {
           letterSpacing: "3px",
         }}
       >
-        No tokens here!
+        {"No tokens here!"}
       </div>
     );
   }
 
-  return (
-    <div
-      className="flex flex-col gap-5 p-5"
-      style={{
-        height: `calc(100vh - ${height}px)`,
-        letterSpacing: "3px",
-      }}
-    >
-      {/* Dialog for token form */}
-      <div className="flex justify-end">
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button
-              type="button"
-              variant="ghost"
-              className="w-50 button hover:cursor-pointer"
-              style={{
-                width: "215px",
-              }}
-            >
-              Create Token
-            </Button>
-          </DialogTrigger>
-
-          <DialogContent
-            aria-describedby="form-content"
-            className="w-full border-0"
-            style={{
-              fontFamily: "Orbitron, sans-serif",
-              boxShadow: "0 0 10px #00FFFF, 0 0 10px #14F195",
-            }}
-          >
-            <DialogHeader className="flex items-center">
-              <DialogTitle className="bg-linear-to-tr from-[#14F195] to-[#00FFFF] bg-clip-text text-transparent font-light text-2xl">
-                Launch your token
-              </DialogTitle>
-            </DialogHeader>
-
-            {/* Token form component */}
-            <div className="no-scrollbar -mx-4 max-h-[67vh] overflow-y-auto px-4">
-              <TokenMetadataForm id="token-metadata-form" isLaunching={isLaunching} setIsLaunching={setIsLaunching}/>
-            </div>
-
-            <DialogDescription className="sr-only"></DialogDescription>
-
-            <DialogFooter>
-              {!isLaunching && (
-                <Button
-                  type="submit"
-                  variant="ghost"
-                  form="token-metadata-form"
-                  className="button"
-                >
-                  Launch
-                </Button>
-              )}
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+  else if (tokenAccounts?.length === 0) {
+    return (
+      <div
+        className="flex flex-col gap-5 justify-center items-center overflow-hidden"
+        style={{
+          height: `calc(100vh - ${height}px)`,
+          fontFamily: "Orbitron, sans-serif",
+          letterSpacing: "3px",
+        }}
+      >
+        <span className="text-3xl">{"This wallet has no spl-tokens."}</span>
+        <span>{"Click the button below to create one."}</span>
+        <TokenDialog />
       </div>
+    );
+  }
 
-      <div className="flex flex-col gap-5 mx-20 mb-5">
-        <div className="grid grid-cols-6 pl-8 pr-5 bg-linear-to-r from-[#14F195] to-[#00FFFF] bg-clip-text text-transparent">
-          <span className="col-span-2">{"ASSET"}</span>
-          <span className="flex justify-end">{"BALANCE"}</span>
-          <span className="flex justify-end">{"PRICE"}</span>
-          <span className="flex justify-end">{"VALUE"}</span>
-          <span className="flex justify-end">{"24H"}</span>
+  else {
+    return (
+      <div
+        className="flex flex-col gap-5 p-5 relative"
+        style={{
+          height: `calc(100vh - ${height}px)`,
+          letterSpacing: "3px",
+        }}
+      >
+        {/* Dialog for token form */}
+        <TokenDialog />
+        <div className="flex flex-col gap-2 px-2">
+          <TableHeader/>
+          <div className="flex flex-col gap-5 overflow-auto max-h-[72vh] scrollbar-none py-5">
+            {tokenAccounts?.length !== 0 &&
+              tokenAccounts?.map((tokenAccount, id) => {
+                return (
+                  <div
+                    key={id}
+                    style={{
+                      animationDelay: `${id * 100}ms`,
+                    }}
+                    className="item bg-linear-to-tr from-[#14F195] to-[#00FFFF] bg-clip-text text-transparent"
+                    >
+                    <Suspense
+                        fallback={<Skeleton className="w-full h-20 bg-gray-800" />}
+                      >
+                        <TokenCard
+                          mintAddress={
+                            new PublicKey(
+                              tokenAccount.account.data.parsed.info.mint,
+                            )
+                          }
+                        />
+                    </Suspense>
+                  </div>
+                );
+              })
+            }
+          </div>
         </div>
-        <div className="flex flex-col gap-5 mb-5">
-          {tokenAccounts?.length !== 0 &&
-            tokenAccounts?.map((tokenAccount, id) => {
-              return (
-                <div
-                  key={id}
-                  style={{
-                    animationDelay: `${id * 100}ms`,
-                  }}
-                  className="item bg-linear-to-tr from-[#14F195] to-[#00FFFF] bg-clip-text text-transparent"
-                >
-                  <Suspense
-                    fallback={<Skeleton className="w-full h-20 bg-gray-800" />}
-                  >
-                    <TokenCard
-                      mintAddress={
-                        new PublicKey(
-                          tokenAccount.account.data.parsed.info.mint,
-                        )
-                      }
-                    />
-                  </Suspense>
-                </div>
-              );
-            })}
-        </div>
+        <div id="table-footer" className="absolute bottom-0 inset-x-0 bg-neutral-800/30 backdrop-blur-lg"><TableFooter/></div>
       </div>
-    </div>
-  );
+    );
+  }
 }
 
 export default Tokens;
