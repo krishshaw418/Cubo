@@ -36,7 +36,6 @@ const imageSchema = z
     (file) => ["image/png", "image/jpeg", "image/gif"].includes(file.type),
     { message: "Invalid image type" }
   )
-  .nullable();
 
 // form field validationwa
 const formSchema = z.object({
@@ -67,7 +66,8 @@ function TokenMetadataForm(props: { id: string, isLaunching: boolean, setIsLaunc
     // react-dropzone for image
     const { acceptedFiles, getInputProps, getRootProps } = useDropzone({
         maxFiles: 1, // number of files allowed
-        accept: { "image/*": [] }, // file type
+        accept: { 'image/png': [], 'image/jpeg': [], 'image/gif': [] }, // file type
+        preventDropOnDocument: true,
         // onDrop function to update the form's image field on image drop
         onDrop: (acceptedFiles) => {
             form.setValue("image", acceptedFiles[0] ?? null, {
@@ -85,7 +85,6 @@ function TokenMetadataForm(props: { id: string, isLaunching: boolean, setIsLaunc
             decimals: 6,
             supply: 1,
             description: "",
-            image: null,
         },
     });
 
@@ -214,7 +213,7 @@ function TokenMetadataForm(props: { id: string, isLaunching: boolean, setIsLaunc
                             render={({ field, fieldState }) => (
                                 <Field data-invalid={fieldState.invalid}>
                                     <FieldLabel htmlFor="token-name" className="label">
-                                        Name
+                                        Name*
                                     </FieldLabel>
                                     <Input
                                         {...field}
@@ -236,7 +235,7 @@ function TokenMetadataForm(props: { id: string, isLaunching: boolean, setIsLaunc
                             render={({ field, fieldState }) => (
                                 <Field data-invalid={fieldState.invalid}>
                                     <FieldLabel htmlFor="token-symbol" className="label">
-                                        Symbol
+                                        Symbol*
                                     </FieldLabel>
                                     <Input
                                         {...field}
@@ -258,7 +257,7 @@ function TokenMetadataForm(props: { id: string, isLaunching: boolean, setIsLaunc
                             render={({ field, fieldState }) => (
                                 <Field data-invalid={fieldState.invalid}>
                                     <FieldLabel htmlFor="token-decimals" className="label">
-                                        Decimals
+                                        Decimals*
                                     </FieldLabel>
                                     <Input
                                         {...field}
@@ -290,7 +289,7 @@ function TokenMetadataForm(props: { id: string, isLaunching: boolean, setIsLaunc
                             render={({ field, fieldState }) => (
                                 <Field data-invalid={fieldState.invalid}>
                                     <FieldLabel htmlFor="token-initial-supply" className="label">
-                                        Supply
+                                        Supply*
                                     </FieldLabel>
                                     <Input
                                         {...field}
@@ -317,7 +316,7 @@ function TokenMetadataForm(props: { id: string, isLaunching: boolean, setIsLaunc
                             render={({ fieldState }) => (
                                 <Field data-invalid={fieldState.invalid}>
                                     <FieldLabel htmlFor="token-image" className="label">
-                                        Image URL
+                                        Image*
                                     </FieldLabel>
                                     <div
                                         {...getRootProps()}
@@ -336,7 +335,7 @@ function TokenMetadataForm(props: { id: string, isLaunching: boolean, setIsLaunc
                                             <ul>
                                                 {acceptedFiles.map((file) => (
                                                     <li key={file.name} className="text-sm">
-                                                        {file.name} - {file.size} bytes
+                                                        {file.name} - {Math.ceil(file.size/1000000)} Mb
                                                     </li>
                                                 ))}
                                             </ul>
@@ -354,7 +353,7 @@ function TokenMetadataForm(props: { id: string, isLaunching: boolean, setIsLaunc
                             render={({ field, fieldState }) => (
                                 <Field data-invalid={fieldState.invalid}>
                                     <FieldLabel htmlFor="token-description" className="label">
-                                        Description
+                                        Description*
                                     </FieldLabel>
                                     <InputGroup className="input-box">
                                         <InputGroupTextarea
