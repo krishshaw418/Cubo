@@ -11,15 +11,12 @@ function useUmi() {
     const { connection } = useConnection();
     const umi = useMemo(() => {
         const umiInstance = createUmi(connection.rpcEndpoint)
+            .use(walletAdapterIdentity(wallet))
             .use(mplTokenMetadata())
             .use(irysUploader());
         return umiInstance;
-    }, [connection.rpcEndpoint]);
+    }, [connection.rpcEndpoint, wallet]);
 
-    useMemo(() => {
-        umi.use(walletAdapterIdentity(wallet)); // For identifying the wallet
-    }, [wallet.publicKey, wallet.connected])
-    
     return { umi };
 }
 

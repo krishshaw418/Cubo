@@ -26,9 +26,9 @@ export function useCreateToken() {
                 uri: uri,
                 sellerFeeBasisPoints: percentAmount(0),
                 tokenStandard: TokenStandard.Fungible
-            }).sendAndConfirm(umi);
+            }).sendAndConfirm(umi, { confirm: { commitment: "finalized" } }); // using "finalized" is important here
 
-            return { mintPubKey: mint.publicKey };
+            return { mint: mint };
         } catch (error) {
             console.error("Mint creation failed:", error);
             throw error;

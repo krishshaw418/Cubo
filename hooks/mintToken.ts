@@ -1,24 +1,21 @@
-import type { PublicKey } from "@solana/web3.js";
 import { mintV1, TokenStandard } from '@metaplex-foundation/mpl-token-metadata';
 import useUmi from "@/hooks/useUmi";
-import { publicKey } from "@metaplex-foundation/umi";
+import { KeypairSigner } from "@metaplex-foundation/umi";
 
 export function useMintToken() {
 
   const { umi } = useUmi();
 
-  const mintTokens = async (mintAddress: PublicKey, mintAmount: number) => {
-
-    console.log("UMI identity:", umi.identity.publicKey.toString());
+  const mintTokens = async (mint: KeypairSigner, mintAmount: number) => {
 
     try {
       const result = await mintV1(umi, {
-        mint: publicKey(mintAddress.toBase58()),
+        mint: mint.publicKey,
         authority: umi.identity,
         amount: mintAmount,
         tokenOwner: umi.identity.publicKey,
         tokenStandard: TokenStandard.Fungible
-      }).sendAndConfirm(umi);
+      }).sendAndConfirm(umi, { confirm: { commitment: "finalized" } }); // using "finalized" is important here
 
       return result.signature;
     } catch (error) {

@@ -98,7 +98,7 @@ function TokenMetadataForm(props: { id: string, isLaunching: boolean, setIsLaunc
   
     async function onSubmit(data: z.infer<typeof formSchema>) {
 
-        props.setIsLaunching((prev) => !prev);
+        props.setIsLaunching(true);
 
         if (!publicKey) {
             toast.error("Wallet not connected!");
@@ -159,7 +159,7 @@ function TokenMetadataForm(props: { id: string, isLaunching: boolean, setIsLaunc
                 toast.success("Mint account initialized successfully!");
                 // minting tokens
                 const mintSignature = await mintTokens(
-                    new PublicKey(result.mintPubKey), // mint address
+                    result.mint, // mint address
                     data.supply, // initial supply of the new token
                 );
 
