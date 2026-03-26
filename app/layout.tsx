@@ -33,7 +33,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${orbitronSans.variable} antialiased`}
+        className={`${orbitronSans.variable} antialiased h-screen`}
       >
         <SolanaProvider>
           <Navbar />

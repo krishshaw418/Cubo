@@ -8,7 +8,7 @@ function Page() {
   return (
     <section
       aria-label="hero"
-      className="flex gap-5 w-full md:w-screen items-center justify-center lg:justify-between p-5 md:p-20 md:my-7 lg:p-30 lg:my-10 overflow-hidden"
+      className="flex w-full items-center justify-between p-5 md:p-20 md:my-7 lg:p-30 lg:my-10"
       style={{
         height: `calc[100vh - ${height}]`,
       }}
@@ -28,7 +28,7 @@ function Page() {
           </div>
         </div>
       </div>
-      <div className="hidden lg:block">
+      <div>
         <div className="cube-container">
           <div className="cube">
             <div className="cube-3d">
