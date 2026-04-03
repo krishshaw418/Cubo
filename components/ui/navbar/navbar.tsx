@@ -14,7 +14,8 @@ function Navbar() {
   const pathname = usePathname() ?? "/";
   const router = useRouter();
 
-  const tabValue = pathname === "/" ? "home" : pathname.startsWith("/tokens") ? "tokens" : "home";
+  // const tabValue = pathname === "/" ? "home" : pathname.startsWith("/tokens") ? "tokens" : "home";
+  const tabValue = pathname === "/" ? "home" : pathname.startsWith("/tokens") ? "tokens" : undefined;
 
   return (
     <div>

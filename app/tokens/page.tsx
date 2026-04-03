@@ -9,7 +9,6 @@ import { redirect } from "next/navigation";
 import "./page.css";
 const TokenCard = lazy(() => import("@/components/ui/token-list/token-card"));
 import { Skeleton } from "@/components/ui/skeleton";
-import { Separator } from "@/components/ui/separator";
 import TokenDialog from "@/components/ui/tokenform.tsx/TokenDialog";
 import TableHeader from "@/components/ui/tokenform.tsx/TableHeader";
 import TableFooter from "@/components/ui/tokenform.tsx/TableFooter";
