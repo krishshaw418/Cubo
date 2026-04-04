@@ -3,7 +3,8 @@ import { Orbitron } from "next/font/google";
 import "./globals.css";
 import { SolanaProvider } from "@/components/providers/solanaProvider";
 import Navbar from "@/components/ui/navbar/navbar";
-import { Toaster } from "@/components/ui/sonner"
+import { Toaster } from "@/components/ui/sonner";
+import TableFooter from "@/components/ui/footer";
 
 // const geistSans = Geist({
 //   variable: "--font-geist-sans",
@@ -17,8 +18,8 @@ import { Toaster } from "@/components/ui/sonner"
 
 const orbitronSans = Orbitron({
   variable: "--font-orbitron-sans",
-  subsets: ["latin"]
-})
+  subsets: ["latin"],
+});
 
 export const metadata: Metadata = {
   title: "cubo.dev | Token launchpad on Solana",
@@ -32,21 +33,22 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body
-        className={`${orbitronSans.variable} antialiased h-screen`}
-      >
+      <body className={`${orbitronSans.variable} antialiased h-screen`}>
         <SolanaProvider>
           <Navbar />
           {children}
-          <Toaster toastOptions={{
-            style: {
-              border: '1px solid transparent',
-              borderRadius: '10px',
-              boxShadow: '0 0 10px #00FFFF, 0 0 10px #14F195',
-              fontFamily: "Orbitron, sans-serif",
-              color: '#00ffd0'
-            }
-          }}/>
+          <TableFooter />
+          <Toaster
+            toastOptions={{
+              style: {
+                border: "1px solid transparent",
+                borderRadius: "10px",
+                boxShadow: "0 0 10px #00FFFF, 0 0 10px #14F195",
+                fontFamily: "Orbitron, sans-serif",
+                color: "#00ffd0",
+              },
+            }}
+          />
         </SolanaProvider>
       </body>
     </html>

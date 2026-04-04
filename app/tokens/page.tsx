@@ -9,9 +9,8 @@ import { redirect } from "next/navigation";
 import "./page.css";
 const TokenCard = lazy(() => import("@/components/ui/token-list/token-card"));
 import { Skeleton } from "@/components/ui/skeleton";
-import TokenDialog from "@/components/ui/tokenform.tsx/TokenDialog";
-import TableHeader from "@/components/ui/tokenform.tsx/TableHeader";
-import TableFooter from "@/components/ui/tokenform.tsx/TableFooter";
+import TokenDialog from "@/components/ui/tokenform/TokenDialog";
+import TableHeader from "@/components/ui/tokenform/TableHeader";
 
 function Tokens() {
   const { connection } = useConnection();
@@ -20,7 +19,7 @@ function Tokens() {
   const height = useNavBarHeight();
   const [tokenAccounts, setTokenAccounts] = useState<
     { pubkey: PublicKey; account: AccountInfo<ParsedAccountData> }[] | undefined
-    >(undefined);
+  >(undefined);
 
   const pubKey = wallet.publicKey;
   useEffect(() => {
@@ -68,9 +67,7 @@ function Tokens() {
         {"No tokens here!"}
       </div>
     );
-  }
-
-  else if (tokenAccounts?.length === 0) {
+  } else if (tokenAccounts?.length === 0) {
     return (
       <div
         className="flex flex-col gap-5 justify-center items-center overflow-hidden"
@@ -85,9 +82,7 @@ function Tokens() {
         <TokenDialog />
       </div>
     );
-  }
-
-  else {
+  } else {
     return (
       <div
         className="flex flex-col gap-5 p-5 relative"
@@ -99,7 +94,7 @@ function Tokens() {
         {/* Dialog for token form */}
         <TokenDialog />
         <div className="flex flex-col gap-2 px-2">
-          <TableHeader/>
+          <TableHeader />
           <div className="flex flex-col gap-5 overflow-auto max-h-[72vh] scrollbar-none py-5">
             {tokenAccounts?.length !== 0 &&
               tokenAccounts?.map((tokenAccount, id) => {
@@ -109,26 +104,26 @@ function Tokens() {
                     style={{
                       animationDelay: `${id * 100}ms`,
                     }}
-                    className="item bg-linear-to-tr from-[#14F195] to-[#00FFFF] bg-clip-text text-transparent"
-                    >
+                    className="item text-white"
+                  >
                     <Suspense
-                        fallback={<Skeleton className="w-full h-20 bg-gray-800" />}
-                      >
-                        <TokenCard
-                          mintAddress={
-                            new PublicKey(
-                              tokenAccount.account.data.parsed.info.mint,
-                            )
-                          }
-                        />
+                      fallback={
+                        <Skeleton className="w-full h-20 bg-gray-800" />
+                      }
+                    >
+                      <TokenCard
+                        mintAddress={
+                          new PublicKey(
+                            tokenAccount.account.data.parsed.info.mint,
+                          )
+                        }
+                      />
                     </Suspense>
                   </div>
                 );
-              })
-            }
+              })}
           </div>
         </div>
-        <div id="table-footer" className="absolute bottom-0 inset-x-0 bg-neutral-800/30 backdrop-blur-lg"><TableFooter/></div>
       </div>
     );
   }

@@ -87,7 +87,7 @@ function Token() {
             <div className='flex flex-col w-[80%]'>
                 <div className='flex justify-between w-full relative'>
                     <div className='flex gap-5'>
-                        <img src={data?.image} alt="token-img" width={50} height={50} style={{
+                        <img src={data?.image} alt="token-img" width={50} height={50} className='shadow-[0_0_15px_rgba(59,130,246,0.5)]' style={{
                             boxShadow: '0 0 4px #00FFFF, 0 0 4px #14F195',
                         }}/>
                         <div>
@@ -96,11 +96,8 @@ function Token() {
                             <p className='text-[8px]'>{mintInfo.freezeAuthority?.toString().slice(0,7)}</p>
                         </div>
                     </div>
-                    <Button type='submit' className='absolute bottom-0 right-0'
+                    <Button type='submit' className='absolute bottom-0 right-0 bg-transparent'
                         style={{
-                            backgroundImage: 'linear-gradient(135deg, #21e47f 0%, #68c4f6 100%)',
-                            WebkitTextFillColor: 'transparent',
-                            WebkitBackgroundClip: 'text',
                             borderRadius: '10px',
                             boxShadow: '0 0 4px #00FFFF, 0 0 4px #14F195',
                         }}
