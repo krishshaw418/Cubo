@@ -75,7 +75,7 @@ function TokenCard(props: { mintAddress: PublicKey }) {
 
   return (
     <div className="rounded-2xl">
-        { data && (
+        { data && balance !== 0 && (
             <div className="grid grid-cols-5 items-center justify-between p-3 bg-transparent rounded-2xl border-l-8 border-l-emerald-300 border border-emerald-300">
                 <span className="flex justify-start items-center gap-5 hover:cursor-pointer" onClick={handleClick}>
                     <img src={data.image} alt="token-img" className="rounded-full h-14 w-14 object-cover border shadow-[0_0_15px_rgba(59,130,246,0.5)]"/>

@@ -11,6 +11,7 @@ import { fetchDigitalAssetWithAssociatedToken } from "@metaplex-foundation/mpl-t
 import { publicKey } from "@metaplex-foundation/umi";
 import useUmi from "@/hooks/useUmi";
 import { Separator } from '@/components/ui/separator';
+import { useWallet } from '@solana/wallet-adapter-react';
 
 function Token() {
     
@@ -28,7 +29,8 @@ function Token() {
             image: string,
             description: string
     } | undefined>(undefined);
-    
+    const { connected } = useWallet()
+
     if (!mintAddress) {
         return;
     }
@@ -48,7 +50,6 @@ function Token() {
         const umiPublicKey = publicKey(mintAddress.toBase58());
         try {
             const result = await fetchDigitalAssetWithAssociatedToken(umi, umiPublicKey, umi.identity.publicKey);
-            console.log(result);
             const tokenBalance = result.token.amount;
             setBalance(() => Number(tokenBalance) / Math.pow(10, result.mint.decimals));
     
@@ -72,8 +73,9 @@ function Token() {
         }
     }
     useEffect(() => {
+        if (!connected || !mintAddress) return; 
         fetchTokenMetaData(new PublicKey(mintAddress));
-    }, []);
+    }, [connected, mintAddress]);
 
   return (
     <div
@@ -83,7 +85,7 @@ function Token() {
         }}
     >
         {isLoading ? <Loader/>: 
-            mintInfo !== null && (
+            mintInfo !== null && data !== null && (
             <div className='flex flex-col w-[80%]'>
                 <div className='flex justify-between w-full relative'>
                     <div className='flex gap-5'>
@@ -128,6 +130,11 @@ function Token() {
                     <div className='flex justify-between p-5'>
                         <span>Decimals</span>
                         <span>{mintInfo.decimals.toString()}</span>
+                    </div>
+                    <Separator className='bg-gray-700'/>
+                    <div className='flex justify-between p-5'>
+                        <span>Your balance</span>
+                        <span>{balance}</span>
                     </div>
                 </div>
             </div>
