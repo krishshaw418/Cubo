@@ -8,7 +8,7 @@ export function useCreatePool() {
     const { connection } = useConnection();
     const wallet = useWallet();
 
-    const createPool = async (mintA: PublicKey, mintB: PublicKey, mintAAmount: number, mintBAmount: number) => {
+    const createPool = async (mintA: PublicKey, mintB: PublicKey, mintAAmount: number, mintBAmount: number, mintADecimal: number) => {
 
         try {
             if (!wallet.publicKey) {
@@ -17,7 +17,9 @@ export function useCreatePool() {
 
             const raydium = await Raydium.load({
                 connection,
-                owner: wallet.publicKey
+                owner: wallet.publicKey,
+                signAllTransactions: wallet.signAllTransactions,
+                cluster: "devnet"
             });
 
             const mintAInfo = await raydium.token.getTokenInfo(mintA);
@@ -40,13 +42,13 @@ export function useCreatePool() {
                 poolFeeAccount: DEVNET_PROGRAM_ID.CREATE_CPMM_POOL_FEE_ACC,
                 mintA: mintAInfo,
                 mintB: mintBInfo,
-                mintAAmount: new BN(mintAAmount),
-                mintBAmount: new BN(mintBAmount),
+                mintAAmount: new BN(mintAAmount * 10 ** mintADecimal),
+                mintBAmount: new BN(mintBAmount * 10 ** 6),
                 startTime: new BN(0),
                 feeConfig: feeConfigs[0],
                 associatedOnly: false,
                 ownerInfo: {
-                useSOLBalance: true,
+                    useSOLBalance: true,
                 },
                 txVersion: TxVersion.V0,
                 // optional: set up priority fee here
@@ -61,6 +63,10 @@ export function useCreatePool() {
                 txId: `https://explorer.solana.com/tx/${txId}`,
                 poolId: extInfo.address.poolId.toBase58(),
             });
+            return {
+                txId: `https://explorer.solana.com/tx/${txId}?cluster=devnet`,
+                poolId: extInfo.address.poolId.toBase58(),
+            }
 
         } catch (error: any) {
             console.error(error);

@@ -6,12 +6,12 @@ import { useConnection } from "@solana/wallet-adapter-react";
 import { useEffect, useState } from 'react';
 import { useNavBarHeight } from '@/hooks/navBarHeight';
 import Loader from '@/components/ui/load-spinner';
-import { Button } from '@/components/ui/button';
 import { fetchDigitalAssetWithAssociatedToken } from "@metaplex-foundation/mpl-token-metadata";
 import { publicKey } from "@metaplex-foundation/umi";
 import useUmi from "@/hooks/useUmi";
 import { Separator } from '@/components/ui/separator';
 import { useWallet } from '@solana/wallet-adapter-react';
+import PoolDialog from '@/components/ui/liquidity-pool/pool-dialog';
 
 function Token() {
     
@@ -85,7 +85,7 @@ function Token() {
         }}
     >
         {isLoading ? <Loader/>: 
-            mintInfo !== null && data !== null && (
+            mintInfo !== null && data !== undefined && (
             <div className='flex flex-col w-[80%]'>
                 <div className='flex justify-between w-full relative'>
                     <div className='flex gap-5'>
@@ -98,12 +98,7 @@ function Token() {
                             <p className='text-[8px]'>{mintInfo.freezeAuthority?.toString().slice(0,7)}</p>
                         </div>
                     </div>
-                    <Button type='submit' className='absolute bottom-0 right-0 bg-transparent'
-                        style={{
-                            borderRadius: '10px',
-                            boxShadow: '0 0 4px #00FFFF, 0 0 4px #14F195',
-                        }}
-                    >Create Liquidity Pool</Button>
+                    <PoolDialog mintName={data?.name} mintAddress={publicKey(mintInfo.address)} mintDecimal={mintInfo.decimals}/>
                 </div>
                 <Separator className='mt-5  mb-7 bg-gray-700'/>
                 <div className='w-full bg-[#161717] rounded-lg'>

@@ -377,7 +377,7 @@ function TokenMetadataForm(props: { id: string, isLaunching: boolean, setIsLaunc
                             )}
                         />
                     </FieldGroup>
-                </form>
+                    </form>
                 )}
             </CardContent>
         </Card>
