@@ -10,7 +10,7 @@ import "./page.css";
 const TokenCard = lazy(() => import("@/components/ui/token-list/token-card"));
 import { Skeleton } from "@/components/ui/skeleton";
 import TokenDialog from "@/components/ui/tokenform/TokenDialog";
-import TableHeader from "@/components/ui/tokenform/TableHeader";
+import TableHeader from "@/components/ui/token-list/TableHeader";
 
 function Tokens() {
   const { connection } = useConnection();

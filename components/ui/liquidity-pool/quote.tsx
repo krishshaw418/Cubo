@@ -14,9 +14,21 @@ const Quotes = [
     "USDC",
 ] as const
 
-export function Quote() {
+interface QuoteProps {
+  id: string
+  value?: string
+  onChange?: (value: string) => void
+  onBlur?: () => void
+  name?: string
+}
+
+export function Quote({ id, value, onChange, onBlur, name }: QuoteProps) {
   return (
-    <Combobox items={Quotes}>
+    <Combobox items={Quotes}
+      id={id}
+      value={value}
+      onValueChange={(value) => onChange?.(value ?? "")}
+    >
       <ComboboxInput placeholder="Select a quote token" />
       <ComboboxContent>
         <ComboboxEmpty>No items found.</ComboboxEmpty>

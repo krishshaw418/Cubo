@@ -12,8 +12,9 @@ import useUmi from "@/hooks/useUmi";
 import { Separator } from '@/components/ui/separator';
 import { useWallet } from '@solana/wallet-adapter-react';
 import PoolDialog from '@/components/ui/liquidity-pool/pool-dialog';
+import { Suspense } from 'react';
 
-function Token() {
+function TokenContent() {
     
     const searchParams = useSearchParams();
     const mintAddress = searchParams.get('mint');
@@ -101,7 +102,7 @@ function Token() {
                     <PoolDialog mintName={data?.name} mintAddress={publicKey(mintInfo.address)} mintDecimal={mintInfo.decimals}/>
                 </div>
                 <Separator className='mt-5  mb-7 bg-gray-700'/>
-                <div className='w-full bg-[#161717] rounded-lg'>
+                <div className='w-full bg-[#161717] rounded-lg overflow-auto'>
                     <div className='flex justify-between p-5'>
                         <span>Address</span>
                         <span>{mintInfo.address.toBase58()}</span>
@@ -139,4 +140,11 @@ function Token() {
   )
 }
 
-export default Token
+// component using useSearchParams() needs to be wrapped in Suspense
+export default function Token() {
+    return (
+        <Suspense fallback={<Loader />}>
+            <TokenContent />
+        </Suspense>
+    );
+}

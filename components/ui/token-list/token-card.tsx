@@ -74,7 +74,7 @@ function TokenCard(props: { mintAddress: PublicKey }) {
     }
 
   return (
-    <div className="rounded-2xl">
+    <>
         { data && balance !== 0 && (
             <div className="grid grid-cols-5 items-center justify-between p-3 bg-transparent rounded-2xl border-l-8 border-l-emerald-300 border border-emerald-300">
                 <span className="flex justify-start items-center gap-5 hover:cursor-pointer" onClick={handleClick}>
@@ -102,7 +102,7 @@ function TokenCard(props: { mintAddress: PublicKey }) {
                 </span>
             </div>
         ) }
-    </div>
+    </>
   )
 }
 
