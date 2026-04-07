@@ -38,7 +38,7 @@ function Tokens() {
         setTokenAccounts(tokenAcc.value);
       } catch (error: any) {
         toast.error(`Error: ${error}`);
-        console.error(error);
+        console.error("Error from tokens:", error);
       }
     };
 
@@ -70,7 +70,7 @@ function Tokens() {
   } else if (tokenAccounts?.length === 0) {
     return (
       <div
-        className="flex flex-col gap-5 justify-center items-center overflow-hidden"
+        className="flex flex-col justify-center items-center overflow-hidden"
         style={{
           height: `calc(100vh - ${height}px)`,
           fontFamily: "Orbitron, sans-serif",
@@ -85,7 +85,7 @@ function Tokens() {
   } else {
     return (
       <div
-        className="flex flex-col gap-5 p-5 relative"
+        className="flex flex-col p-5 relative"
         style={{
           height: `calc(100vh - ${height}px)`,
           letterSpacing: "3px",
@@ -93,12 +93,10 @@ function Tokens() {
       >
         {/* Dialog for token form */}
         <TokenDialog />
-        <div className="flex flex-col gap-2 px-2">
-          <TableHeader />
-          <div className="flex flex-col gap-5 overflow-auto max-h-[72vh] scrollbar-none py-5">
+        <TableHeader />
+        <div className="flex flex-col px-2 overflow-auto scrollbar-none">
             {tokenAccounts?.length !== 0 &&
-              tokenAccounts?.map((tokenAccount, id) => {
-                return (
+              tokenAccounts?.map((tokenAccount, id) =>
                   <div
                     key={id}
                     style={{
@@ -120,9 +118,7 @@ function Tokens() {
                       />
                     </Suspense>
                   </div>
-                );
-              })}
-          </div>
+              )}
         </div>
       </div>
     );

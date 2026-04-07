@@ -1,7 +1,7 @@
 
 function TableHeader() {
   return (
-    <div className="grid grid-cols-5 bg-linear-to-r pr-3 pl-5 text-white">
+    <div className="grid grid-cols-5 bg-linear-to-r pr-3 pl-5 pt-5 pb-2 text-white">
         <span className="flex justify-start">{"ASSET"}</span>
         <span className="flex justify-end">{"BALANCE"}</span>
         <span className="flex justify-end">{"PRICE"}</span>
