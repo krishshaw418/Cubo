@@ -13,8 +13,11 @@ import { Separator } from '@/components/ui/separator';
 import { useWallet } from '@solana/wallet-adapter-react';
 import PoolDialog from '@/components/ui/liquidity-pool/pool-dialog';
 import { Suspense } from 'react';
+import { PoolFetchType } from '@raydium-io/raydium-sdk-v2';
+import { Raydium } from '@raydium-io/raydium-sdk-v2';
+import { ApiV3PoolInfoItem } from '@raydium-io/raydium-sdk-v2';
 
-function TokenContent() {
+function TokenContent(props: { raydium: Promise<Raydium> }) {
     
     const searchParams = useSearchParams();
     const mintAddress = searchParams.get('mint');
@@ -24,6 +27,7 @@ function TokenContent() {
     const navBarHeight = useNavBarHeight();
     const [isLoading, setIsLoading] = useState(false);
     const [balance, setBalance] = useState<number | undefined>(undefined);
+    const [pools, setPools] = useState<ApiV3PoolInfoItem[] | null>(null);
     const [data, setData] = useState<{
             name: string,
             symbol: string,
@@ -36,17 +40,16 @@ function TokenContent() {
         return;
     }
 
-    useEffect(() => {
-        const fetchTokenMint = async () => {
-            setIsLoading(true);
+    const fetchTokenMint = async () => {
+        try {
             const mintInfo = await getMint(connection, new PublicKey(mintAddress));
             setMintInfo(mintInfo);
-            setIsLoading(false);
+        } catch (error) {
+            console.error(error);
+            return;
         }
-
-        fetchTokenMint();
-    }, []);
-
+    }
+        
     const fetchTokenMetaData = async (mintAddress: PublicKey) => {
         const umiPublicKey = publicKey(mintAddress.toBase58());
         try {
@@ -73,14 +76,37 @@ function TokenContent() {
             return;
         }
     }
+
+    const fetchTokenPools = async (mintAddress: PublicKey) => {
+        try {
+            const list = await (await props.raydium).api.fetchPoolByMints({
+                mint1: mintAddress, // The mint you want to search for
+                type: PoolFetchType.Standard,          // Optional: Fetch CLMM, Standard, and others
+                sort: 'liquidity',                // Optional: Sort results
+                order: 'desc',                    // Optional: Sort order
+            });
+            setPools(list.data);
+        } catch (error) {
+            console.error(error);
+            return;
+        }
+    }
+
     useEffect(() => {
-        if (!connected || !mintAddress) return; 
-        fetchTokenMetaData(new PublicKey(mintAddress));
+        if (!connected || !mintAddress) return;
+        const fetchData = async () => {
+            setIsLoading(true);
+            await fetchTokenMint();
+            await fetchTokenMetaData(new PublicKey(mintAddress));
+            await fetchTokenPools(new PublicKey(mintAddress));
+            setIsLoading(false);
+        }
+        fetchData();
     }, [connected, mintAddress]);
 
   return (
     <div
-        className='text-white flex items-center justify-center'
+        className='text-white flex flex-col items-center justify-center overflow-auto scrollbar-none'
         style={{
             height: `calc(100vh - ${navBarHeight}px)`
         }}
@@ -132,6 +158,17 @@ function TokenContent() {
                         <span>Your balance</span>
                         <span>{balance}</span>
                     </div>
+                    {pools && (
+                        pools.map((pool, id) => {
+                            return (<>
+                                <Separator className='bg-gray-700'/>
+                                <div key={id} className='flex justify-between p-5'>
+                                    <span>Pool Id {id + 1}</span>
+                                    <span>{pool.id}</span>
+                                </div>
+                            </>
+                        )})
+                    )}
                 </div>
             </div>
             )
@@ -142,9 +179,24 @@ function TokenContent() {
 
 // component using useSearchParams() needs to be wrapped in Suspense
 export default function Token() {
+
+    const { connection } = useConnection();
+    const wallet = useWallet();
+
+    if (!wallet.publicKey) {
+        return;
+    }
+
+    const raydium = Raydium.load({
+        connection,
+        owner: wallet.publicKey,
+        signAllTransactions: wallet.signAllTransactions,
+        cluster: "devnet"
+    });
+
     return (
         <Suspense fallback={<Loader />}>
-            <TokenContent />
+            <TokenContent raydium={raydium} />
         </Suspense>
     );
 }
