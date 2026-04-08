@@ -9,10 +9,8 @@ import { redirect } from "next/navigation";
 import "./page.css";
 const TokenCard = lazy(() => import("@/components/ui/token-list/token-card"));
 import { Skeleton } from "@/components/ui/skeleton";
-import { Separator } from "@/components/ui/separator";
-import TokenDialog from "@/components/ui/tokenform.tsx/TokenDialog";
-import TableHeader from "@/components/ui/tokenform.tsx/TableHeader";
-import TableFooter from "@/components/ui/tokenform.tsx/TableFooter";
+import TokenDialog from "@/components/ui/tokenform/TokenDialog";
+import TableHeader from "@/components/ui/token-list/TableHeader";
 
 function Tokens() {
   const { connection } = useConnection();
@@ -21,7 +19,7 @@ function Tokens() {
   const height = useNavBarHeight();
   const [tokenAccounts, setTokenAccounts] = useState<
     { pubkey: PublicKey; account: AccountInfo<ParsedAccountData> }[] | undefined
-    >(undefined);
+  >(undefined);
 
   const pubKey = wallet.publicKey;
   useEffect(() => {
@@ -40,7 +38,7 @@ function Tokens() {
         setTokenAccounts(tokenAcc.value);
       } catch (error: any) {
         toast.error(`Error: ${error}`);
-        console.error(error);
+        console.error("Error from tokens:", error);
       }
     };
 
@@ -69,12 +67,10 @@ function Tokens() {
         {"No tokens here!"}
       </div>
     );
-  }
-
-  else if (tokenAccounts?.length === 0) {
+  } else if (tokenAccounts?.length === 0) {
     return (
       <div
-        className="flex flex-col gap-5 justify-center items-center overflow-hidden"
+        className="flex flex-col justify-center items-center overflow-hidden"
         style={{
           height: `calc(100vh - ${height}px)`,
           fontFamily: "Orbitron, sans-serif",
@@ -86,12 +82,10 @@ function Tokens() {
         <TokenDialog />
       </div>
     );
-  }
-
-  else {
+  } else {
     return (
       <div
-        className="flex flex-col gap-5 p-5 relative"
+        className="flex flex-col p-5 relative"
         style={{
           height: `calc(100vh - ${height}px)`,
           letterSpacing: "3px",
@@ -99,37 +93,33 @@ function Tokens() {
       >
         {/* Dialog for token form */}
         <TokenDialog />
-        <div className="flex flex-col gap-2 px-2">
-          <TableHeader/>
-          <div className="flex flex-col gap-5 overflow-auto max-h-[72vh] scrollbar-none py-5">
+        <TableHeader />
+        <div className="flex flex-col px-2 overflow-auto scrollbar-none">
             {tokenAccounts?.length !== 0 &&
-              tokenAccounts?.map((tokenAccount, id) => {
-                return (
+              tokenAccounts?.map((tokenAccount, id) =>
                   <div
                     key={id}
                     style={{
                       animationDelay: `${id * 100}ms`,
                     }}
-                    className="item bg-linear-to-tr from-[#14F195] to-[#00FFFF] bg-clip-text text-transparent"
-                    >
+                    className="item text-white"
+                  >
                     <Suspense
-                        fallback={<Skeleton className="w-full h-20 bg-gray-800" />}
-                      >
-                        <TokenCard
-                          mintAddress={
-                            new PublicKey(
-                              tokenAccount.account.data.parsed.info.mint,
-                            )
-                          }
-                        />
+                      fallback={
+                        <Skeleton className="w-full h-20 bg-gray-800" />
+                      }
+                    >
+                      <TokenCard
+                        mintAddress={
+                          new PublicKey(
+                            tokenAccount.account.data.parsed.info.mint,
+                          )
+                        }
+                      />
                     </Suspense>
                   </div>
-                );
-              })
-            }
-          </div>
+              )}
         </div>
-        <div id="table-footer" className="absolute bottom-0 inset-x-0 bg-neutral-800/30 backdrop-blur-lg"><TableFooter/></div>
       </div>
     );
   }

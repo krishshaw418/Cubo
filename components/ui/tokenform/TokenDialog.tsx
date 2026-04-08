@@ -13,10 +13,11 @@ function TokenDialog() {
           <DialogTrigger asChild>
             <Button
               type="button"
-              variant="ghost"
-              className="w-50 button hover:cursor-pointer"
+              className="w-50 bg-transparent hover:cursor-pointer"
               style={{
                 width: "215px",
+                borderRadius: '10px',
+                boxShadow: '0 0 4px #00FFFF, 0 0 4px #14F195',
               }}
             >
               Create Token
@@ -32,7 +33,7 @@ function TokenDialog() {
             }}
           >
             <DialogHeader className="flex items-center">
-              <DialogTitle className="bg-linear-to-tr from-[#14F195] to-[#00FFFF] bg-clip-text text-transparent font-light text-2xl">
+              <DialogTitle className="font-light text-2xl">
                 Launch your token
               </DialogTitle>
             </DialogHeader>
@@ -48,9 +49,13 @@ function TokenDialog() {
               {!isLaunching && (
                 <Button
                   type="submit"
-                  variant="ghost"
                   form="token-metadata-form"
-                  className="button"
+                  className="w-50 bg-transparent hover:cursor-pointer"
+                  style={{
+                    width: "215px",
+                    borderRadius: '10px',
+                    boxShadow: '0 0 4px #00FFFF, 0 0 4px #14F195',
+                  }}
                 >
                   Launch
                 </Button>

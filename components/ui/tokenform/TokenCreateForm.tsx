@@ -221,7 +221,6 @@ function TokenMetadataForm(props: { id: string, isLaunching: boolean, setIsLaunc
                                         aria-invalid={fieldState.invalid}
                                         placeholder="Ex: Solana"
                                         autoComplete="off"
-                                        className="input-box"
                                     />
                                     {fieldState.invalid && (
                                         <FieldError errors={[fieldState.error]} />
@@ -243,7 +242,6 @@ function TokenMetadataForm(props: { id: string, isLaunching: boolean, setIsLaunc
                                         aria-invalid={fieldState.invalid}
                                         placeholder="Ex: SOL"
                                         autoComplete="off"
-                                        className="input-box"
                                     />
                                     {fieldState.invalid && (
                                         <FieldError errors={[fieldState.error]} />
@@ -267,7 +265,6 @@ function TokenMetadataForm(props: { id: string, isLaunching: boolean, setIsLaunc
                                         placeholder="6"
                                         autoComplete="off"
                                         onChange={(e) => field.onChange(parseFloat(e.target.value))}
-                                        className="input-box"
                                         min={1}
                                         max={9}
                                     />
@@ -299,7 +296,6 @@ function TokenMetadataForm(props: { id: string, isLaunching: boolean, setIsLaunc
                                         placeholder="1"
                                         autoComplete="off"
                                         onChange={(e) => field.onChange(parseFloat(e.target.value))}
-                                        className="input-box"
                                         min={1}
                                         max={1000000000}
                                     />
@@ -320,7 +316,7 @@ function TokenMetadataForm(props: { id: string, isLaunching: boolean, setIsLaunc
                                     </FieldLabel>
                                     <div
                                         {...getRootProps()}
-                                        className={`input-box p-4 rounded-lg border-2 border-dashed text-center cursor-pointer ${fieldState.invalid ? "border-red-500" : "border-gray-300"
+                                        className={`p-4 rounded-lg border-2 border-dashed text-center cursor-pointer ${fieldState.invalid ? "border-red-500" : "border-gray-300"
                                             }`}
                                     >
                                         {/* getInputProps handles type, accept, onChange internally */}
@@ -355,7 +351,7 @@ function TokenMetadataForm(props: { id: string, isLaunching: boolean, setIsLaunc
                                     <FieldLabel htmlFor="token-description" className="label">
                                         Description*
                                     </FieldLabel>
-                                    <InputGroup className="input-box">
+                                    <InputGroup>
                                         <InputGroupTextarea
                                             {...field}
                                             id="token-description"
@@ -365,7 +361,7 @@ function TokenMetadataForm(props: { id: string, isLaunching: boolean, setIsLaunc
                                             aria-invalid={fieldState.invalid}
                                         />
                                         <InputGroupAddon align="block-end">
-                                            <InputGroupText className="tabular-nums text-xs">
+                                            <InputGroupText className="tabular-nums text-[10px]">
                                                 {field.value.length}/500 characters
                                             </InputGroupText>
                                         </InputGroupAddon>
@@ -377,7 +373,7 @@ function TokenMetadataForm(props: { id: string, isLaunching: boolean, setIsLaunc
                             )}
                         />
                     </FieldGroup>
-                </form>
+                    </form>
                 )}
             </CardContent>
         </Card>

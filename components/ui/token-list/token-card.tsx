@@ -1,8 +1,10 @@
+"use client"
 import { fetchDigitalAssetWithAssociatedToken } from "@metaplex-foundation/mpl-token-metadata";
 import useUmi from "@/hooks/useUmi";
 import { PublicKey } from "@solana/web3.js";
 import { publicKey } from "@metaplex-foundation/umi";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 
 function TokenCard(props: { mintAddress: PublicKey }) {
 
@@ -17,6 +19,8 @@ function TokenCard(props: { mintAddress: PublicKey }) {
     const [price, setPrice] = useState(Number((Math.random() * 1000).toFixed(2)));
     const [value, setValue] = useState(Number((Math.random() * 1000).toFixed(2)));
     const [volume, setVolume] = useState(Number(Math.floor((Math.random() * 1000000000))));
+    const router = useRouter();
+    const searchParams = useSearchParams();
 
     const fetchTokenMetaData = async (mintAddress: PublicKey) => {
         const umiPublicKey = publicKey(mintAddress.toBase58());
@@ -47,10 +51,10 @@ function TokenCard(props: { mintAddress: PublicKey }) {
 
     useEffect(() => {
         fetchTokenMetaData(props.mintAddress);
-    }, []);
+    }, [props.mintAddress]);
 
     useEffect(() => {
-        setInterval(() => {
+        const id = setInterval(() => {
             let val = Math.random() * 1000;
             val = Number(val.toFixed(2));
             setValue(val);
@@ -60,14 +64,21 @@ function TokenCard(props: { mintAddress: PublicKey }) {
             let vol = Math.random() * 1000000000;
             vol = Math.floor(vol);
             setVolume(vol);
-        }, 10000); 
+        }, 10000);
+        return () => clearInterval(id);
     }, []);
 
+    const handleClick = () => {
+        const params = new URLSearchParams(searchParams);
+        params.set('mint', props.mintAddress.toString());
+        router.push(`token?${params.toString()}`);
+    }
+
   return (
-    <div className="rounded-2xl">
-        { data && (
-            <div className="grid grid-cols-5 items-center justify-between p-3 bg-transparent rounded-2xl border-l-8 border-l-emerald-300 border border-emerald-300 shadow-[0_0_15px_rgba(59,130,246,0.5)]">
-                <span className="flex justify-start items-center gap-5">
+    <>
+        { data && balance !== 0 && (
+            <div className="grid grid-cols-5 items-center justify-between my-2 p-3 bg-transparent rounded-2xl border-l-8 border-l-emerald-300 border border-emerald-300">
+                <span className="flex justify-start items-center gap-5 hover:cursor-pointer" onClick={handleClick}>
                     <img src={data.image} alt="token-img" className="rounded-full h-14 w-14 object-cover border shadow-[0_0_15px_rgba(59,130,246,0.5)]"/>
                     <div className="flex flex-col">
                         <h1 className="font-extrabold text-lg">
@@ -92,7 +103,7 @@ function TokenCard(props: { mintAddress: PublicKey }) {
                 </span>
             </div>
         ) }
-    </div>
+    </>
   )
 }
 
