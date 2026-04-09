@@ -16,6 +16,7 @@ import { Suspense } from 'react';
 import { PoolFetchType } from '@raydium-io/raydium-sdk-v2';
 import { Raydium } from '@raydium-io/raydium-sdk-v2';
 import { ApiV3PoolInfoItem } from '@raydium-io/raydium-sdk-v2';
+import CopyToClipboard from '@/components/ui/copy';
 
 function TokenContent(props: { raydium: Promise<Raydium> }) {
     
@@ -131,7 +132,7 @@ function TokenContent(props: { raydium: Promise<Raydium> }) {
                 <div className='w-full bg-[#161717] rounded-lg overflow-auto'>
                     <div className='flex justify-between p-5'>
                         <span>Address</span>
-                        <span>{mintInfo.address.toBase58()}</span>
+                        <CopyToClipboard>{mintInfo.address.toBase58()}</CopyToClipboard>
                     </div>
                     <Separator className='bg-gray-700'/>
                     <div className='flex justify-between p-5'>
@@ -141,12 +142,12 @@ function TokenContent(props: { raydium: Promise<Raydium> }) {
                     <Separator className='bg-gray-700'/>
                     <div className='flex justify-between p-5'>
                         <span>Mint Authority</span>
-                        <span>{mintInfo.mintAuthority?.toBase58()}</span>
+                        <CopyToClipboard>{mintInfo.mintAuthority?.toBase58()}</CopyToClipboard>
                     </div>
                     <Separator className='bg-gray-700'/>
                     <div className='flex justify-between p-5'>
                         <span>Freeze Authority</span>
-                        <span>{mintInfo.freezeAuthority?.toBase58()}</span>
+                        <CopyToClipboard>{mintInfo.freezeAuthority?.toBase58()}</CopyToClipboard>
                     </div>
                     <Separator className='bg-gray-700'/>
                     <div className='flex justify-between p-5'>
@@ -164,7 +165,7 @@ function TokenContent(props: { raydium: Promise<Raydium> }) {
                                 <Separator className='bg-gray-700'/>
                                 <div key={id} className='flex justify-between p-5'>
                                     <span>Pool Id {id + 1}</span>
-                                    <span>{pool.id}</span>
+                                    <CopyToClipboard>{pool.id}</CopyToClipboard>
                                 </div>
                             </>
                         )})
