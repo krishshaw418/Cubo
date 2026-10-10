@@ -1,203 +1,239 @@
-"use client"
-import { useSearchParams } from 'next/navigation'
+"use client";
+
+import { useSearchParams } from "next/navigation";
 import { PublicKey } from "@solana/web3.js";
 import { getMint, Mint } from "@solana/spl-token";
-import { useConnection } from "@solana/wallet-adapter-react";
-import { useEffect, useState } from 'react';
-import { useNavBarHeight } from '@/hooks/navBarHeight';
-import Loader from '@/components/ui/load-spinner';
+import { useConnection, useWallet } from "@solana/wallet-adapter-react";
+import { useEffect, useState, Suspense } from "react";
+import { useNavBarHeight } from "@/hooks/navBarHeight";
+import Loader from "@/components/ui/load-spinner";
 import { fetchDigitalAssetWithAssociatedToken } from "@metaplex-foundation/mpl-token-metadata";
 import { publicKey } from "@metaplex-foundation/umi";
 import useUmi from "@/hooks/useUmi";
-import { Separator } from '@/components/ui/separator';
-import { useWallet } from '@solana/wallet-adapter-react';
-import PoolDialog from '@/components/ui/liquidity-pool/pool-dialog';
-import { Suspense } from 'react';
-import { PoolFetchType } from '@raydium-io/raydium-sdk-v2';
-import { Raydium } from '@raydium-io/raydium-sdk-v2';
-import { ApiV3PoolInfoItem } from '@raydium-io/raydium-sdk-v2';
-import CopyToClipboard from '@/components/ui/copy';
+import { Separator } from "@/components/ui/separator";
+import PoolDialog from "@/components/ui/liquidity-pool/pool-dialog";
+import {
+  PoolFetchType,
+  Raydium,
+  ApiV3PoolInfoItem,
+} from "@raydium-io/raydium-sdk-v2";
+import CopyToClipboard from "@/components/ui/copy";
 
-function TokenContent(props: { raydium: Promise<Raydium> }) {
-    
-    const searchParams = useSearchParams();
-    const mintAddress = searchParams.get('mint');
-    const { umi } = useUmi();
-    const { connection } = useConnection();
-    const [mintInfo, setMintInfo] = useState<Mint | null>(null);
-    const navBarHeight = useNavBarHeight();
-    const [isLoading, setIsLoading] = useState(false);
-    const [balance, setBalance] = useState<number | undefined>(undefined);
-    const [pools, setPools] = useState<ApiV3PoolInfoItem[] | null>(null);
-    const [data, setData] = useState<{
-            name: string,
-            symbol: string,
-            image: string,
-            description: string
-    } | undefined>(undefined);
-    const { connected } = useWallet()
+type TokenMetadata = {
+  name: string;
+  symbol: string;
+  image: string;
+  description: string;
+};
 
-    if (!mintAddress) {
-        return;
-    }
+function TokenContent({ raydium }: { raydium: Promise<Raydium> }) {
+  const searchParams = useSearchParams();
+  const mintAddress = searchParams.get("mint");
+  const { umi } = useUmi();
+  const { connection } = useConnection();
+  const { connected } = useWallet();
+  const navBarHeight = useNavBarHeight();
+  const [mintInfo, setMintInfo] = useState<Mint | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [balance, setBalance] = useState<number>();
+  const [pools, setPools] = useState<ApiV3PoolInfoItem[] | null>(null);
+  const [data, setData] = useState<TokenMetadata>();
 
-    const fetchTokenMint = async () => {
-        try {
-            const mintInfo = await getMint(connection, new PublicKey(mintAddress));
-            setMintInfo(mintInfo);
-        } catch (error) {
-            console.error(error);
-            return;
-        }
-    }
-        
-    const fetchTokenMetaData = async (mintAddress: PublicKey) => {
-        const umiPublicKey = publicKey(mintAddress.toBase58());
-        try {
-            const result = await fetchDigitalAssetWithAssociatedToken(umi, umiPublicKey, umi.identity.publicKey);
-            const tokenBalance = result.token.amount;
-            setBalance(() => Number(tokenBalance) / Math.pow(10, result.mint.decimals));
-    
-            // Fetching the metadata from the metadata uri
-            const metadata = await fetch(result.metadata.uri);
-    
-            // deserializing the data
-            const data: {
-                name: string,
-                symbol: string,
-                image: string,
-                description: string
-            } = await metadata.json();
-    
-            if (data) {
-                setData(data);
-            }
-        } catch (error: any) {
-            console.error(error);
-            return;
-        }
-    }
+  useEffect(() => {
+    if (!connected || !mintAddress) return;
+    let cancelled = false;
 
-    const fetchTokenPools = async (mintAddress: PublicKey) => {
-        try {
-            const list = await (await props.raydium).api.fetchPoolByMints({
-                mint1: mintAddress, // The mint you want to search for
-                type: PoolFetchType.Standard,          // Optional: Fetch CLMM, Standard, and others
-                sort: 'liquidity',                // Optional: Sort results
-                order: 'desc',                    // Optional: Sort order
-            });
-            setPools(list.data);
-        } catch (error) {
-            console.error(error);
-            return;
-        }
-    }
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        const mintKey = new PublicKey(mintAddress);
+        const [mint, asset] = await Promise.all([
+          getMint(connection, mintKey),
+          fetchDigitalAssetWithAssociatedToken(
+            umi,
+            publicKey(mintKey.toBase58()),
+            umi.identity.publicKey,
+          ),
+        ]);
+        if (cancelled) return;
+        setMintInfo(mint);
+        setBalance(
+          Number(asset.token.amount) / Math.pow(10, asset.mint.decimals),
+        );
 
-    useEffect(() => {
-        if (!connected || !mintAddress) return;
-        const fetchData = async () => {
-            setIsLoading(true);
-            await fetchTokenMint();
-            await fetchTokenMetaData(new PublicKey(mintAddress));
-            await fetchTokenPools(new PublicKey(mintAddress));
-            setIsLoading(false);
-        }
-        fetchData();
-    }, [connected, mintAddress]);
+        const metadataResponse = await fetch(asset.metadata.uri);
+        if (!metadataResponse.ok)
+          throw new Error("Unable to fetch token metadata");
+        const metadata = (await metadataResponse.json()) as TokenMetadata;
+        if (!cancelled) setData(metadata);
+
+        const poolResponse = await (
+          await raydium
+        ).api.fetchPoolByMints({
+          mint1: mintKey,
+          type: PoolFetchType.Standard,
+          sort: "liquidity",
+          order: "desc",
+        });
+        if (!cancelled) setPools(poolResponse.data);
+      } catch (error) {
+        console.error("Failed to fetch token details:", error);
+      } finally {
+        if (!cancelled) setIsLoading(false);
+      }
+    };
+
+    void fetchData();
+    return () => {
+      cancelled = true;
+    };
+  }, [connected, mintAddress, connection, umi, raydium]);
+
+  if (!mintAddress) {
+    return (
+      <div className="px-4 py-10 text-center text-sm text-muted-foreground">
+        No token mint was provided.
+      </div>
+    );
+  }
+
+  const DetailRow = ({
+    label,
+    children,
+  }: {
+    label: string;
+    children: React.ReactNode;
+  }) => (
+    <div className="flex min-w-0 flex-col gap-2 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:gap-6 sm:px-5">
+      <span className="shrink-0 text-sm text-muted-foreground sm:text-base">
+        {label}
+      </span>
+      <div className="min-w-0 max-w-full break-all text-sm sm:text-right sm:text-base">
+        {children}
+      </div>
+    </div>
+  );
 
   return (
-    <div
-        className='text-white flex flex-col items-center justify-center overflow-auto scrollbar-none'
-        style={{
-            height: `calc(100vh - ${navBarHeight}px)`
-        }}
+    <main
+      className="min-h-0 overflow-y-auto text-white"
+      style={{ minHeight: `calc(100dvh - ${navBarHeight}px)` }}
     >
-        {isLoading ? <Loader/>: 
-            mintInfo !== null && data !== undefined && (
-            <div className='flex flex-col w-[80%]'>
-                <div className='flex justify-between w-full relative'>
-                    <div className='flex gap-5'>
-                        <img src={data?.image} alt="token-img" width={50} height={50} className='shadow-[0_0_15px_rgba(59,130,246,0.5)]' style={{
-                            boxShadow: '0 0 4px #00FFFF, 0 0 4px #14F195',
-                        }}/>
-                        <div>
-                            <p className='font-bold'>{data?.name}</p>
-                            <p className='text-xs font-extralight'>{data?.symbol}</p>
-                            <p className='text-[8px]'>{mintInfo.freezeAuthority?.toString().slice(0,7)}</p>
-                        </div>
-                    </div>
-                    <PoolDialog mintName={data?.name} mintAddress={publicKey(mintInfo.address)} mintDecimal={mintInfo.decimals}/>
-                </div>
-                <Separator className='mt-5  mb-7 bg-gray-700'/>
-                <div className='w-full bg-[#161717] rounded-lg overflow-auto'>
-                    <div className='flex justify-between p-5'>
-                        <span>Address</span>
-                        <CopyToClipboard>{mintInfo.address.toBase58()}</CopyToClipboard>
-                    </div>
-                    <Separator className='bg-gray-700'/>
-                    <div className='flex justify-between p-5'>
-                        <span>Supply</span>
-                        <span>{mintInfo.supply.toString()}</span>
-                    </div>
-                    <Separator className='bg-gray-700'/>
-                    <div className='flex justify-between p-5'>
-                        <span>Mint Authority</span>
-                        <CopyToClipboard>{mintInfo.mintAuthority?.toBase58()}</CopyToClipboard>
-                    </div>
-                    <Separator className='bg-gray-700'/>
-                    <div className='flex justify-between p-5'>
-                        <span>Freeze Authority</span>
-                        <CopyToClipboard>{mintInfo.freezeAuthority?.toBase58()}</CopyToClipboard>
-                    </div>
-                    <Separator className='bg-gray-700'/>
-                    <div className='flex justify-between p-5'>
-                        <span>Decimals</span>
-                        <span>{mintInfo.decimals.toString()}</span>
-                    </div>
-                    <Separator className='bg-gray-700'/>
-                    <div className='flex justify-between p-5'>
-                        <span>Your balance</span>
-                        <span>{balance}</span>
-                    </div>
-                    {pools && (
-                        pools.map((pool, id) => {
-                            return (<>
-                                <Separator className='bg-gray-700'/>
-                                <div key={id} className='flex justify-between p-5'>
-                                    <span>Pool Id {id + 1}</span>
-                                    <CopyToClipboard>{pool.id}</CopyToClipboard>
-                                </div>
-                            </>
-                        )})
-                    )}
-                </div>
+      {isLoading ? (
+        <div className="flex min-h-[50vh] items-center justify-center">
+          <Loader />
+        </div>
+      ) : mintInfo && data ? (
+        <div className="mx-auto w-full max-w-5xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+          <header className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex min-w-0 items-center gap-3 sm:gap-5">
+              <img
+                src={data.image}
+                alt={`${data.name} token`}
+                width={56}
+                height={56}
+                className="size-12 shrink-0 rounded-full object-cover shadow-[0_0_8px_#00FFFF,0_0_8px_#14F195] sm:size-14"
+              />
+              <div className="min-w-0">
+                <h1 className="break-words text-lg font-bold sm:text-2xl">
+                  {data.name}
+                </h1>
+                <p className="text-sm font-light text-muted-foreground">
+                  {data.symbol}
+                </p>
+                <p className="mt-1 break-all text-xs text-muted-foreground">
+                  Mint: {mintInfo.address.toBase58()}
+                </p>
+              </div>
             </div>
-            )
-        }
-    </div>
-  )
+            <div className="w-full sm:w-auto sm:shrink-0">
+              <PoolDialog
+                mintName={data.name}
+                mintAddress={publicKey(mintInfo.address)}
+                mintDecimal={mintInfo.decimals}
+              />
+            </div>
+          </header>
+
+          <Separator className="my-6 bg-gray-700 sm:my-8" />
+          <section
+            aria-label="Token details"
+            className="overflow-hidden rounded-xl border border-gray-800 bg-[#161717]"
+          >
+            <DetailRow label="Address">
+              <CopyToClipboard>{mintInfo.address.toBase58()}</CopyToClipboard>
+            </DetailRow>
+            <Separator className="bg-gray-700" />
+            <DetailRow label="Supply">
+              <span>{mintInfo.supply.toString()}</span>
+            </DetailRow>
+            <Separator className="bg-gray-700" />
+            <DetailRow label="Mint Authority">
+              <CopyToClipboard>
+                {mintInfo.mintAuthority?.toBase58() ?? "None"}
+              </CopyToClipboard>
+            </DetailRow>
+            <Separator className="bg-gray-700" />
+            <DetailRow label="Freeze Authority">
+              <CopyToClipboard>
+                {mintInfo.freezeAuthority?.toBase58() ?? "None"}
+              </CopyToClipboard>
+            </DetailRow>
+            <Separator className="bg-gray-700" />
+            <DetailRow label="Decimals">
+              <span>{mintInfo.decimals}</span>
+            </DetailRow>
+            <Separator className="bg-gray-700" />
+            <DetailRow label="Your balance">
+              <span>{balance ?? "—"}</span>
+            </DetailRow>
+            {pools?.map((pool, index) => (
+              <div key={pool.id}>
+                <Separator className="bg-gray-700" />
+                <DetailRow label={`Pool ID ${index + 1}`}>
+                  <CopyToClipboard>{pool.id}</CopyToClipboard>
+                </DetailRow>
+              </div>
+            ))}
+          </section>
+        </div>
+      ) : (
+        <div className="px-4 py-10 text-center text-sm text-muted-foreground">
+          Token details are unavailable. Connect your wallet and try again.
+        </div>
+      )}
+    </main>
+  );
 }
 
-// component using useSearchParams() needs to be wrapped in Suspense
 export default function Token() {
+  const { connection } = useConnection();
+  const wallet = useWallet();
 
-    const { connection } = useConnection();
-    const wallet = useWallet();
-
-    if (!wallet.publicKey) {
-        return;
-    }
-
-    const raydium = Raydium.load({
-        connection,
-        owner: wallet.publicKey,
-        signAllTransactions: wallet.signAllTransactions,
-        cluster: "devnet"
-    });
-
+  if (!wallet.publicKey) {
     return (
-        <Suspense fallback={<Loader />}>
-            <TokenContent raydium={raydium} />
-        </Suspense>
+      <div className="px-4 py-10 text-center text-sm text-muted-foreground">
+        Connect your wallet to view token details.
+      </div>
     );
+  }
+
+  const raydium = Raydium.load({
+    connection,
+    owner: wallet.publicKey,
+    signAllTransactions: wallet.signAllTransactions,
+    cluster: "devnet",
+  });
+
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-[50vh] items-center justify-center">
+          <Loader />
+        </div>
+      }
+    >
+      <TokenContent raydium={raydium} />
+    </Suspense>
+  );
 }

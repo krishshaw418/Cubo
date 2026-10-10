@@ -15,114 +15,108 @@ import TableHeader from "@/components/ui/token-list/TableHeader";
 function Tokens() {
   const { connection } = useConnection();
   const wallet = useWallet();
-  const isConnected = useWallet().connected;
+  const isConnected = wallet.connected;
   const height = useNavBarHeight();
   const [tokenAccounts, setTokenAccounts] = useState<
     { pubkey: PublicKey; account: AccountInfo<ParsedAccountData> }[] | undefined
-  >(undefined);
-
+  >();
   const pubKey = wallet.publicKey;
+
   useEffect(() => {
     const fetchTokenAccounts = async () => {
+      if (!pubKey) return;
       try {
-        if (!pubKey) {
-          return;
-        }
         const tokenAcc = await connection.getParsedTokenAccountsByOwner(
           pubKey,
-          {
-            programId: TOKEN_PROGRAM_ID,
-          },
+          { programId: TOKEN_PROGRAM_ID },
         );
-
         setTokenAccounts(tokenAcc.value);
-      } catch (error: any) {
-        toast.error(`Error: ${error}`);
+      } catch (error) {
+        toast.error(`Unable to fetch tokens: ${String(error)}`);
         console.error("Error from tokens:", error);
       }
     };
-
-    fetchTokenAccounts();
+    void fetchTokenAccounts();
   }, [isConnected, pubKey, connection]);
 
   useEffect(() => {
     if (!isConnected) {
       toast.warning("Connect wallet to see your tokens!");
-      setTimeout(() => {
-        redirect("/");
-      }, 1000);
+      const timeout = setTimeout(() => redirect("/"), 1000);
+      return () => clearTimeout(timeout);
     }
   }, [isConnected]);
 
+  const pageStyle = { minHeight: `calc(100dvh - ${height}px)` };
+
   if (!isConnected) {
     return (
-      <div
-        className="flex justify-center items-center overflow-hidden"
-        style={{
-          height: `calc(100vh - ${height}px)`,
-          fontFamily: "Orbitron, sans-serif",
-          letterSpacing: "3px",
-        }}
+      <main
+        className="flex items-center justify-center px-4 py-12 text-center"
+        style={pageStyle}
       >
-        {"No tokens here!"}
-      </div>
-    );
-  } else if (tokenAccounts?.length === 0) {
-    return (
-      <div
-        className="flex flex-col justify-center items-center overflow-hidden"
-        style={{
-          height: `calc(100vh - ${height}px)`,
-          fontFamily: "Orbitron, sans-serif",
-          letterSpacing: "3px",
-        }}
-      >
-        <span className="text-3xl">{"This wallet has no spl-tokens."}</span>
-        <span>{"Click the button below to create one."}</span>
-        <TokenDialog />
-      </div>
-    );
-  } else {
-    return (
-      <div
-        className="flex flex-col p-5 relative"
-        style={{
-          height: `calc(100vh - ${height}px)`,
-          letterSpacing: "3px",
-        }}
-      >
-        {/* Dialog for token form */}
-        <TokenDialog />
-        <TableHeader />
-        <div className="flex flex-col px-2 overflow-auto scrollbar-none">
-            {tokenAccounts?.length !== 0 &&
-              tokenAccounts?.map((tokenAccount, id) =>
-                  <div
-                    key={id}
-                    style={{
-                      animationDelay: `${id * 100}ms`,
-                    }}
-                    className="item text-white"
-                  >
-                    <Suspense
-                      fallback={
-                        <Skeleton className="w-full h-20 bg-gray-800" />
-                      }
-                    >
-                      <TokenCard
-                        mintAddress={
-                          new PublicKey(
-                            tokenAccount.account.data.parsed.info.mint,
-                          )
-                        }
-                      />
-                    </Suspense>
-                  </div>
-              )}
-        </div>
-      </div>
+        <p className="font-orbitron text-base tracking-widest sm:text-lg">
+          No tokens here!
+        </p>
+      </main>
     );
   }
+
+  if (tokenAccounts?.length === 0) {
+    return (
+      <main
+        className="flex flex-col items-center justify-center gap-4 px-4 py-12 text-center"
+        style={pageStyle}
+      >
+        <h1 className="font-orbitron text-xl tracking-wide sm:text-3xl">
+          This wallet has no SPL tokens.
+        </h1>
+        <p className="max-w-md text-sm text-muted-foreground sm:text-base">
+          Create a token to get started.
+        </p>
+        <TokenDialog />
+      </main>
+    );
+  }
+
+  return (
+    <main
+      className="mx-auto flex w-full max-w-7xl flex-col gap-4 px-3 py-4 sm:gap-6 sm:px-6 sm:py-6 lg:px-8"
+      style={pageStyle}
+    >
+      <div className="flex justify-end">
+        <TokenDialog />
+      </div>
+
+      <div className="w-full min-w-0 overflow-x-auto">
+        <div className="min-w-[800px]">
+          <TableHeader />
+
+          <div className="flex flex-col gap-3 pb-4">
+            {tokenAccounts?.map((tokenAccount, id) => (
+              <div
+                key={tokenAccount.pubkey.toBase58()}
+                style={{ "--i": id } as React.CSSProperties}
+                className="item min-w-0 text-white"
+              >
+                <Suspense
+                  fallback={
+                    <Skeleton className="h-20 w-full rounded-xl bg-gray-800" />
+                  }
+                >
+                  <TokenCard
+                    mintAddress={
+                      new PublicKey(tokenAccount.account.data.parsed.info.mint)
+                    }
+                  />
+                </Suspense>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </main>
+  );
 }
 
 export default Tokens;

@@ -1,14 +1,13 @@
-
 function TableHeader() {
   return (
-    <div className="grid grid-cols-5 bg-linear-to-r pr-3 pl-5 pt-5 pb-2 text-white">
-        <span className="flex justify-start">{"ASSET"}</span>
-        <span className="flex justify-end">{"BALANCE"}</span>
-        <span className="flex justify-end">{"PRICE"}</span>
-        <span className="flex justify-end">{"VALUE"}</span>
-        <span className="flex justify-end">{"24H"}</span>
+    <div className="grid grid-cols-[minmax(16rem,2fr)_repeat(4,minmax(7rem,1fr))] items-center gap-2 px-3 pb-2 pt-5 text-white">
+      <span className="text-left">ASSET</span>
+      <span className="text-right">BALANCE</span>
+      <span className="text-right">PRICE</span>
+      <span className="text-right">VALUE</span>
+      <span className="text-right">24H</span>
     </div>
-  )
+  );
 }
 
-export default TableHeader
+export default TableHeader;
